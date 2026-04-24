@@ -1,0 +1,49 @@
+        <!-- include '../app/views/layouts/header.php'; -->
+<?php include 'app/views/layouts/header.php'; ?>
+<?php include 'app/views/layouts/sidebar.php';?>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+
+                <h3>
+                    <?php echo $abiertos; ?>
+                </h3>
+
+                Tickets abiertos
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                15 En Proceso
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-body">
+                4 Urgentes
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<a href="/tickets"
+    class="btn btn-primary">
+    Ver tickets
+</a>
+
+</div>
+</body>
+
+</html>
