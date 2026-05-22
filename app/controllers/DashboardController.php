@@ -1,4 +1,6 @@
 <?php
+
+require 'core/auth.php';
 require './config/database.php';
 
 $sql="SELECT count(*) total

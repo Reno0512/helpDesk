@@ -24,23 +24,23 @@ $uri
 switch (true) {
 
     case $uri == '':
-    case $uri == 'login':
 
+    case $uri == 'login':
         require './app/controllers/AuthController.php';
         break;
 
-
     case $uri == 'dashboard':
-
         require __DIR__ . '/../app/controllers/DashboardController.php';
         break;
 
-
     case $uri == 'tickets':
-
         require __DIR__ . '/../app/controllers/TicketController.php';
         break;
 
+    case $uri == 'ver_ticket/':
+        require './app/controllers/TicketController.php';
+        verTicket();
+        break;
 
 
     case preg_match(
@@ -64,8 +64,6 @@ switch (true) {
         header('Location:/login');
 
         break;
-
-
 
     default:
 

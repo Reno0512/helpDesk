@@ -1,6 +1,6 @@
 <?php
 
-require 'core/auth.php';
+// require 'core/auth.php';
 require 'config/database.php';
 
 if ($_POST) {
@@ -9,9 +9,10 @@ if ($_POST) {
     $pass = md5($_POST['password']);
 
     $sql = "SELECT * FROM usuarios
-WHERE usuario='$user'
-AND password='$pass'
-LIMIT 1";
+    WHERE usuario='$user'
+    AND password='$pass'
+    AND activo= '1'
+    LIMIT 1";
 
     $r = $conn->query($sql);
 
@@ -21,9 +22,18 @@ LIMIT 1";
 
         $_SESSION["id"] = $u["id"];
         $_SESSION["nombre"] = $u["nombre"];
+        $_SESSION["usuario"] = $u["usuario"];
         $_SESSION["rol"] = $u["rol"];
 
-        header("location:/dashboard");
+        $rol = $u["rol"];
+        
+        if ($rol === "admin"){
+            header("location:/dashboard");
+        }else {
+            header("location:/tickets");
+        }
+
+        
         exit;
     } else {
 

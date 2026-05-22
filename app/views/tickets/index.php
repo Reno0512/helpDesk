@@ -17,8 +17,12 @@
         <tr>
             <th>Folio</th>
             <th>Titulo</th>
+            <th>Área</th>
             <th>Prioridad</th>
             <th>Estatus</th>
+            <?php if ($_SESSION["rol"] === "admin"): ?>
+                <th>Acciones</th>
+            <?php endif; ?>
         </tr>
     </thead>
 
@@ -37,12 +41,42 @@
                 </td>
 
                 <td>
+                    <?php echo $t['area']; ?>
+                </td>
+
+                <td>
                     <?php echo $t['prioridad']; ?>
                 </td>
 
                 <td>
                     <?php echo $t['estatus']; ?>
                 </td>
+
+                <?php if ($_SESSION["rol"] === "admin"): ?>
+                    <td>
+
+                        <a
+                            href="/ver_ticket/<?php echo $t['id']; ?>"
+                            class="btn btn-info btn-sm">
+                            Ver
+                        </a>
+
+
+                        <a
+                            href="?url=editar_ticket&id=<?php echo $t['id']; ?>"
+                            class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+
+
+                        <button
+                            onclick="eliminar(<?php echo $t['id']; ?>)"
+                            class="btn btn-danger btn-sm">
+                            Eliminar
+                        </button>
+
+                    </td>
+                <?php endif; ?>
 
             </tr>
 
@@ -60,14 +94,14 @@
 
         <div class="modal-content">
 
-            <div class="modal-header bg-warning text-dark">
+            <div class="modal-header bg-dark text-white">
                 <h5 class="modal-title">
                     Levantar Falla
                 </h5>
 
                 <button
                     type="button"
-                    class="btn-close"
+                    class="btn-close btn-close-white"
                     data-bs-dismiss="modal">
                 </button>
 
@@ -85,13 +119,17 @@
                             class="form-control">
                     </div>
 
+                    <div class="mb-3">
+                        <label>Área</label>
+                        <input
+                            name="area"
+                            class="form-control">
+                    </div>
+
 
                     <div class="mb-3">
                         <label>Descripción</label>
-                        <textarea
-                            name="descripcion"
-                            class="form-control">
-                        </textarea>
+                        <textarea name="descripcion" class="form-control"></textarea>
                     </div>
 
 
@@ -137,11 +175,55 @@
 </div>
 
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $('#tabla').DataTable({
         language: {
-            url: '//cdn.datatables.net/plug-ins/{plugins-release-version}/i18n/es-ES.json',
+            url: 'assets/datatables/es-ES.json',
         },
+    });
+
+    $("#guardar").click(function() {
+
+        $.ajax({
+
+            url: "api/tickets.php",
+            type: "POST",
+            data: $("#ticketForm").serialize(),
+
+            success: function(folio) {
+
+                // Swal.fire(
+                //     'Correcto',
+                //     'Ticket registrado',
+                //     'success'
+                // );
+
+                Swal.fire({
+                    title: 'Ticket registrado',
+                    text: 'Se generó correctamente',
+                    text: 'Folio ' + folio,
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        $("#ticketForm")[0].reset();
+                        $("#modalTicket").modal('hide');
+
+                        location.reload();
+                    }
+
+                });
+
+            }
+
+        });
+
     });
 </script>

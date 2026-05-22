@@ -23,7 +23,9 @@
             <a class="navbar-brand">
                 Sistema de tickets
             </a>
+            <a href="/logout" class="btn btn-danger">Salir</a>
         </div>
+        
     </nav>
 
     <div>
