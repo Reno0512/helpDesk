@@ -26,25 +26,25 @@ switch (true) {
     case $uri == '':
 
     case $uri == 'login':
-        require './app/controllers/AuthController.php';
+        require __DIR__ .'/../app/controllers/AuthController.php';
         break;
 
     case $uri == 'dashboard':
-        require __DIR__ . '/../app/controllers/DashboardController.php';
+        require __DIR__ .'/../app/controllers/DashboardController.php';
         break;
 
     case $uri == 'tickets':
-        require __DIR__ . '/../app/controllers/TicketController.php';
+        require __DIR__ .'/../app/controllers/TicketController.php';
+        indexTickets();
         break;
 
-    case $uri == 'ver_ticket/':
-        require './app/controllers/TicketController.php';
-        verTicket();
-        break;
-
+    // case $uri == 'ver_ticket/':
+    //     require './app/controllers/TicketController.php';
+    //     verTicket();
+    //     break;
 
     case preg_match(
-        '/^ticket\/([0-9]+)$/',
+        '/^ver_ticket\/([0-9]+)$/',
         $uri,
         $matches
     ):
@@ -52,6 +52,8 @@ switch (true) {
         $_GET["id"] = $matches[1];
 
         require __DIR__ . '/../app/controllers/TicketController.php';
+
+        verTicket();
 
         break;
 

@@ -1,6 +1,9 @@
-<!-- <?php include './app/views/layouts/sidebar.php'; ?>
+<?php include 'app/views/layouts/header.php'; ?>
+<?php include './app/views/layouts/sidebar.php'; ?>
 
-<h3>
+<div class="container-fluid">
+
+<h3 class="mb-4">
     Ticket:
     <?php echo $ticket["folio"]; ?>
 </h3>
@@ -8,33 +11,153 @@
 
 <div class="row">
 
+    <!-- INFORMACION TICKET -->
     <div class="col-md-6">
 
-        <div class="card shadow">
+        <div class="card shadow mb-4">
+
+            <div class="card-header bg-primary text-white">
+                Información Ticket
+            </div>
+
             <div class="card-body">
 
-                <h5>
+                <h4>
                     <?php echo $ticket["titulo"]; ?>
-                </h5>
+                </h4>
+
+                <hr>
 
                 <p>
                     <?php echo $ticket["descripcion"]; ?>
                 </p>
 
-                Prioridad:
-                <b>
-                    <?php echo $ticket["prioridad"]; ?>
-                </b>
+                <p>
+                    <b>Prioridad:</b>
 
-                <br><br>
+                    <?php
+                    switch($ticket["prioridad"]){
 
-                Estado:
-                <span class="badge bg-warning">
-                    <?php echo $ticket["estatus"]; ?>
-                </span>
+                        case 'Alta':
+                            echo '<span class="badge bg-danger">Alta</span>';
+                        break;
+
+                        case 'Media':
+                            echo '<span class="badge bg-warning">Media</span>';
+                        break;
+
+                        default:
+                            echo '<span class="badge bg-success">Baja</span>';
+                    }
+                    ?>
+                </p>
+
+
+                <p>
+                    <b>Estatus:</b>
+
+                    <?php
+                    switch($ticket["estatus"]){
+
+                        case 'En proceso':
+                            echo '<span class="badge bg-warning">En proceso</span>';
+                        break;
+
+                        case 'Cerrado':
+                            echo '<span class="badge bg-success">Cerrado</span>';
+                        break;
+
+                        default:
+                            echo '<span class="badge bg-secondary">Nuevo</span>';
+                    }
+                    ?>
+                </p>
 
             </div>
         </div>
 
     </div>
-</div> -->
+
+
+
+    <!-- ACTUALIZAR -->
+    <div class="col-md-6">
+
+        <div class="card shadow mb-4">
+
+            <div class="card-header bg-dark text-white">
+                Seguimiento
+            </div>
+
+            <div class="card-body">
+
+                <form
+                action="/actualizar_ticket"
+                method="POST">
+
+                    <input
+                    type="hidden"
+                    name="ticket_id"
+                    value="<?php echo $ticket['id']; ?>">
+
+
+                    <div class="mb-3">
+
+                        <label>
+                            Cambiar Estatus
+                        </label>
+
+                        <select
+                        name="estatus"
+                        class="form-control">
+
+                            <option value="Nuevo">
+                                Nuevo
+                            </option>
+
+                            <option value="En proceso">
+                                En proceso
+                            </option>
+
+                            <option value="Pendiente">
+                                Pendiente
+                            </option>
+
+                            <option value="Cerrado">
+                                Cerrado
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <div class="mb-3">
+
+                        <label>
+                            Comentario Técnico
+                        </label>
+
+                        <textarea
+                        name="comentario"
+                        class="form-control"
+                        rows="5"></textarea>
+
+                    </div>
+
+
+                    <button class="btn btn-primary">
+                        Guardar Seguimiento
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</div>

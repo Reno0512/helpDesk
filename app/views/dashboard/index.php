@@ -1,52 +1,61 @@
-        <!-- include '../app/views/layouts/header.php'; -->
-        <?php include 'app/views/layouts/header.php'; ?>
-        <?php include 'app/views/layouts/sidebar.php'; ?>
+<?php include 'app/views/layouts/header.php'; ?>
+<?php include 'app/views/layouts/sidebar.php'; ?>
 
 
-        <?php if ($_SESSION["rol"] === "admin"): ?>
-            <div class="row">
+<?php if ($_SESSION["rol"] === "admin"): ?>
+    <div class="row">
 
-                <div class="col-md-4">
-                    <div class="card shadow">
-                        <div class="card-body">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
 
-                            <h3>
-                                <?php echo $abiertos; ?>
-                            </h3>
+                    <h3>
+                        <?php echo $abiertos; ?>
+                    </h3>
 
-                            Tickets abiertos
+                    Tickets abiertos
 
-                        </div>
-                    </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            15 En Proceso
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card shadow">
-                        <div class="card-body">
-                            4 Urgentes
-                        </div>
-                    </div>
-                </div>
-
             </div>
+        </div>
 
-            <hr>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3>
+                        <?php echo $enProceso; ?>
+                    </h3>
 
-            <a href="/tickets"
-                class="btn btn-primary">
-                Ver tickets
-            </a>
-        <?php endif; ?>
+                    Tickets En Proceso
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3>
+                        <?php echo $urgentes; ?>
+                    </h3>
+
+                    Tickets Urgentes
+
+                </div>
+            </div>
+        </div>
 
     </div>
+
+    <hr>
+
+    <a href="/tickets"
+        class="btn btn-primary">
+        Ver tickets
+    </a>
+<?php endif; ?>
+
+</div>
 </body>
 
 </html>

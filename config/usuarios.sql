@@ -1,0 +1,26 @@
+INSERT INTO `usuarios` 
+(`nombre`, `usuario`, `password`, `rol`, `activo`) 
+VALUES 
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+('Administrador', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin', 1),
+

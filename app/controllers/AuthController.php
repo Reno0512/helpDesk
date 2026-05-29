@@ -1,7 +1,7 @@
 <?php
 
 // require 'core/auth.php';
-require 'config/database.php';
+require './config/database.php';
 
 if ($_POST) {
 
@@ -16,6 +16,8 @@ if ($_POST) {
 
     $r = $conn->query($sql);
 
+    // var_dump($r);
+
     if ($r->num_rows > 0) {
 
         $u = $r->fetch_assoc();
@@ -27,7 +29,7 @@ if ($_POST) {
 
         $rol = $u["rol"];
         
-        if ($rol === "admin"){
+        if ($rol === "admin"){  
             header("location:/dashboard");
         }else {
             header("location:/tickets");
@@ -37,7 +39,7 @@ if ($_POST) {
         exit;
     } else {
 
-        $error = "Credenciales incorrectas";
+        $error = "Usuario o contraseña incorrectas";
     }
 }
 

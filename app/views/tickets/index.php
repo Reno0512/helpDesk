@@ -16,6 +16,7 @@
     <thead>
         <tr>
             <th>Folio</th>
+            
             <th>Titulo</th>
             <th>Área</th>
             <th>Prioridad</th>
@@ -61,8 +62,7 @@
                             Ver
                         </a>
 
-
-                        <a
+                        <!-- <a
                             href="?url=editar_ticket&id=<?php echo $t['id']; ?>"
                             class="btn btn-warning btn-sm">
                             Editar
@@ -73,7 +73,7 @@
                             onclick="eliminar(<?php echo $t['id']; ?>)"
                             class="btn btn-danger btn-sm">
                             Eliminar
-                        </button>
+                        </button> -->
 
                     </td>
                 <?php endif; ?>
@@ -113,39 +113,24 @@
                 <form id="ticketForm">
 
                     <div class="mb-3">
+                        <label>Reportante</label>
+                        <input
+                            name="reportante"
+                            class="form-control"
+                            placeholder="Nombre de quien reporta">
+                    </div>
+
+                    <div class="mb-3">
                         <label>Titulo</label>
                         <input
                             name="titulo"
-                            class="form-control">
+                            class="form-control"
+                            placeholder="Titulo o asunto principal del problema">
                     </div>
-
-                    <div class="mb-3">
-                        <label>Área</label>
-                        <input
-                            name="area"
-                            class="form-control">
-                    </div>
-
 
                     <div class="mb-3">
                         <label>Descripción</label>
-                        <textarea name="descripcion" class="form-control"></textarea>
-                    </div>
-
-
-                    <div class="mb-3">
-                        <label>Prioridad</label>
-
-                        <select
-                            name="prioridad"
-                            class="form-select">
-
-                            <option>Baja</option>
-                            <option>Media</option>
-                            <option>Alta</option>
-
-                        </select>
-
+                        <textarea name="descripcion" class="form-control" placeholder="Describe tu problema con detalle anexando folio(s) de equipo(s)"></textarea>
                     </div>
 
                 </form>

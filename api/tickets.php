@@ -25,19 +25,20 @@ $folio =
     );
 
 
+$reportante = $_POST["reportante"];
 $titulo = $_POST["titulo"];
-$area = $_POST["area"];
+$area = $_SESSION["usuario"];
+// $area = $_POST["area"];
 $descripcion = $_POST["descripcion"];
-$prioridad = $_POST["prioridad"];
 
 
 $sql = "
 INSERT INTO tickets(
 folio,
+reportante,
 titulo,
 area,
 descripcion,
-prioridad,
 estatus
 )
 
@@ -46,7 +47,6 @@ VALUES(
 '$titulo',
 '$area',
 '$descripcion',
-'$prioridad',
 'Nuevo'
 )
 ";
