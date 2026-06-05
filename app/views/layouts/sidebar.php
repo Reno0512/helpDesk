@@ -9,6 +9,8 @@
 
         <h4>Área de Informática</h4>
 
+        <h6><?= $_SESSION["nombre"] ?></h6>
+
         <hr>
 
         <ul class="nav flex-column">

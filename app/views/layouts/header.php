@@ -1,3 +1,7 @@
+<?php
+    // Define la URL base de tu sitio web
+    define('BASE_URL', 'http://localhost/');
+?>
 <!doctype html>
 <html>
 
@@ -21,6 +25,7 @@
 
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
+            <img src="<?php echo BASE_URL; ?>/assets/img/logoBiselSombraH.png" alt="logoTaxco" class="img-fluid ms-3" style="max-height: 50px;">
             <a class="navbar-brand">
                 Sistema de tickets
             </a>

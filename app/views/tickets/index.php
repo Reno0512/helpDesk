@@ -1,5 +1,9 @@
-<?php include 'app/views/layouts/header.php'; ?>
-<?php include 'app/views/layouts/sidebar.php'; ?>
+<?php
+
+include 'app/views/layouts/header.php';
+include 'app/views/layouts/sidebar.php';
+
+?>
 
 <h3>Tickets</h3>
 
@@ -16,12 +20,12 @@
     <thead>
         <tr>
             <th>Folio</th>
-            
+
             <th>Titulo</th>
             <th>Área</th>
             <th>Prioridad</th>
             <th>Estatus</th>
-            <?php if ($_SESSION["rol"] === "admin"): ?>
+            <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico"): ?>
                 <th>Acciones</th>
             <?php endif; ?>
         </tr>
@@ -42,7 +46,7 @@
                 </td>
 
                 <td>
-                    <?php echo $t['area']; ?>
+                    <?php echo $t['nombre_area']; ?>
                 </td>
 
                 <td>
@@ -53,8 +57,8 @@
                     <?php echo $t['estatus']; ?>
                 </td>
 
-                <?php if ($_SESSION["rol"] === "admin"): ?>
-                    <td>
+                <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico") : ?>
+                    <td class="text-center">
 
                         <a
                             href="/ver_ticket/<?php echo $t['id']; ?>"
@@ -129,9 +133,26 @@
                     </div>
 
                     <div class="mb-3">
+
+                        <label>Área General:</label>
+                        <select id="area" class="form-control" name="area" onchange="cargarSubareas(this.value)" required>
+                            <option value="" selected disabled>Selecciona una Dirección General</option>
+                            <?php foreach ($areas_principales as $area): ?>
+                                <option value="<?php echo $area['id_area']; ?>">
+                                    <?php echo htmlspecialchars($area['nombre']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
                         <label>Descripción</label>
                         <textarea name="descripcion" class="form-control" placeholder="Describe tu problema con detalle anexando folio(s) de equipo(s)"></textarea>
                     </div>
+
+                    <input type="hidden" id="usuario_id" name="usuario_id" value=<?=$_SESSION["id"] ?>>
+                    <input type="hidden" id="rol" name="rol" value=<?=$_SESSION["rol"] ?>>
 
                 </form>
 

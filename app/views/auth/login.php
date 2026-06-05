@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/main.css">
 </head>
 
 <body class="bg-light">
@@ -16,7 +16,7 @@
 
                 <div class="card shadow-lg">
 
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header bg-taxco text-white text-center">
                         <h4>SISTEMA DE TICKETS DE INFORMÁTICA</h4>
                     </div>
 
@@ -29,6 +29,8 @@
                             </div>
 
                         <?php } ?>
+
+                        <img src="assets/img/LogoSTI.png" alt="logo" class="img-fluid w-50 d-block mx-auto mb-3">
 
                         <form method="POST">
 
@@ -43,7 +45,7 @@
                                 class="form-control mb-3"
                                 placeholder="Contraseña">
 
-                            <button class="btn btn-primary w-100">
+                            <button class="btn btn-taxco w-100">
                                 Entrar
                             </button>
 

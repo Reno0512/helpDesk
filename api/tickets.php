@@ -2,6 +2,7 @@
 
 require '../config/database.php';
 
+
 $ultimo =
     $conn->query("
 SELECT id
@@ -27,30 +28,19 @@ $folio =
 
 $reportante = $_POST["reportante"];
 $titulo = $_POST["titulo"];
-$area = $_SESSION["usuario"];
-// $area = $_POST["area"];
+// $area = $_SESSION["usuario"];
+$area = $_POST["area"];
 $descripcion = $_POST["descripcion"];
+$tecnico_id = $_POST["usuario_id"];
+$rol = $_POST["rol"];
 
-
-$sql = "
-INSERT INTO tickets(
-folio,
-reportante,
-titulo,
-area,
-descripcion,
-estatus
-)
-
-VALUES(
-'$folio',
-'$titulo',
-'$area',
-'$descripcion',
-'Nuevo'
-)
-";
-
+switch ($rol) {
+    case 'tecnico':
+        $sql = "INSERT INTO tickets(folio,reportante,titulo,area_id,descripcion,estatus,tecnico_id) VALUES ('$folio','$reportante','$titulo','$area','$descripcion','Nuevo','$tecnico_id')";
+        break;
+    default:
+        $sql = "INSERT INTO tickets(folio,reportante,titulo,area_id,descripcion,estatus) VALUES ('$folio','$reportante','$titulo','$area','$descripcion','Nuevo')";
+}
 
 if ($conn->query($sql)) {
     echo $folio;

@@ -19,22 +19,22 @@ $uri = str_replace(
 $uri
 );
 */
-
+// echo $uri;
 
 switch (true) {
 
     case $uri == '':
 
     case $uri == 'login':
-        require __DIR__ .'/../app/controllers/AuthController.php';
+        require __DIR__ . '/../app/controllers/AuthController.php';
         break;
 
     case $uri == 'dashboard':
-        require __DIR__ .'/../app/controllers/DashboardController.php';
+        require __DIR__ . '/../app/controllers/DashboardController.php';
         break;
 
     case $uri == 'tickets':
-        require __DIR__ .'/../app/controllers/TicketController.php';
+        require __DIR__ . '/../app/controllers/TicketController.php';
         indexTickets();
         break;
 
@@ -57,6 +57,28 @@ switch (true) {
 
         break;
 
+    case $uri == 'cerrar_ticket':
+
+        require __DIR__ . '/../app/controllers/TicketController.php';
+
+        cerrarTicket();
+
+        break;
+
+    case preg_match(
+        '/^pdf_ticket\/([0-9]+)$/',
+        $uri,
+        $matches
+    ):
+
+        $_GET["id"] = $matches[1];
+
+        require __DIR__ . '/../app/controllers/TicketController.php';
+
+        generarPDF();
+        
+        break;
+
 
 
     case $uri == 'logout':
@@ -73,3 +95,5 @@ switch (true) {
 
         echo "404 página no encontrada";
 }
+
+
