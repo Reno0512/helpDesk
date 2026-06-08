@@ -1,6 +1,6 @@
 <?php
     // Define la URL base de tu sitio web
-    define('BASE_URL', 'http://localhost/');
+    define('BASE_URL', 'https://sti.taxco.gob.mx/');
 ?>
 <!doctype html>
 <html>

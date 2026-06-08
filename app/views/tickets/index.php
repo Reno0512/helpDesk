@@ -1,9 +1,5 @@
-<?php
-
-include 'app/views/layouts/header.php';
-include 'app/views/layouts/sidebar.php';
-
-?>
+<?php include 'app/views/layouts/header.php'; ?>
+<?php include 'app/views/layouts/sidebar.php';?>
 
 <h3>Tickets</h3>
 
