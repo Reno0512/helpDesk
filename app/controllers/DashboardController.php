@@ -5,7 +5,7 @@ require './config/database.php';
 
 $sql="SELECT count(*) total
 FROM tickets
-WHERE estatus='Nuevo'";
+WHERE estatus_id=1";
 
 $res=$conn->query($sql);
 $row=$res->fetch_assoc();
@@ -14,7 +14,7 @@ $abiertos=$row['total'];
 
 $sql="SELECT count(*) total
 FROM tickets
-WHERE estatus='En Proceso'";
+WHERE estatus_id=2";
 
 $res=$conn->query($sql);
 $row=$res->fetch_assoc();
@@ -23,12 +23,12 @@ $enProceso=$row['total'];
 
 $sql="SELECT count(*) total
 FROM tickets
-WHERE estatus='Urgente'";
+WHERE estatus_id=3";
 
 $res=$conn->query($sql);
 $row=$res->fetch_assoc();
 
-$urgentes=$row['total'];
+$cerrados=$row['total'];
 
 
 

@@ -2,7 +2,7 @@
 <?php include 'app/views/layouts/sidebar.php'; ?>
 
 
-<?php if ($_SESSION["rol"] === "admin"): ?>
+<?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico") : ?>
     <div class="row">
 
         <div class="col-md-4">
@@ -36,10 +36,10 @@
             <div class="card shadow">
                 <div class="card-body">
                     <h3>
-                        <?php echo $urgentes; ?>
+                        <?php echo $cerrados; ?>
                     </h3>
 
-                    Tickets Urgentes
+                    Tickets Cerrados
 
                 </div>
             </div>

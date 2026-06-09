@@ -36,10 +36,10 @@ $rol = $_POST["rol"];
 
 switch ($rol) {
     case 'tecnico':
-        $sql = "INSERT INTO tickets(folio,reportante,titulo,area_id,descripcion,estatus,tecnico_id) VALUES ('$folio','$reportante','$titulo','$area','$descripcion','Nuevo','$tecnico_id')";
+        $sql = "INSERT INTO tickets(folio,reportante,titulo,area_id,descripcion,estatus_id,tecnico_id) VALUES ('$folio','$reportante','$titulo','$area','$descripcion',1,'$tecnico_id')";
         break;
     default:
-        $sql = "INSERT INTO tickets(folio,reportante,titulo,area_id,descripcion,estatus) VALUES ('$folio','$reportante','$titulo','$area','$descripcion','Nuevo')";
+        $sql = "INSERT INTO tickets(folio,reportante,titulo,area_id,descripcion,estatus_id) VALUES ('$folio','$reportante','$titulo','$area','$descripcion',1)";
 }
 
 if ($conn->query($sql)) {

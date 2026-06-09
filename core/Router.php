@@ -38,6 +38,11 @@ switch (true) {
         indexTickets();
         break;
 
+
+    case $uri == 'actualizar_ticket':
+        require __DIR__ . '/../app/controllers/TicketController.php';
+        guardarSeguimiento();
+        break;
     // case $uri == 'ver_ticket/':
     //     require './app/controllers/TicketController.php';
     //     verTicket();
@@ -56,6 +61,7 @@ switch (true) {
         verTicket();
 
         break;
+
 
     case $uri == 'cerrar_ticket':
 
@@ -76,7 +82,7 @@ switch (true) {
         require __DIR__ . '/../app/controllers/TicketController.php';
 
         generarPDF();
-        
+
         break;
 
 
@@ -95,5 +101,3 @@ switch (true) {
 
         echo "404 página no encontrada";
 }
-
-

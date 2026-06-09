@@ -1,5 +1,5 @@
 <?php include 'app/views/layouts/header.php'; ?>
-<?php include 'app/views/layouts/sidebar.php';?>
+<?php include 'app/views/layouts/sidebar.php'; ?>
 
 <h3>Tickets</h3>
 
@@ -11,12 +11,11 @@
 </button>
 
 <table id="tabla"
-    class="table table-bordered">
+    class="table table-bordered" style="width:100%">
 
     <thead>
         <tr>
             <th>Folio</th>
-
             <th>Titulo</th>
             <th>Área</th>
             <th>Prioridad</th>
@@ -50,7 +49,27 @@
                 </td>
 
                 <td>
-                    <?php echo $t['estatus']; ?>
+                    <?php
+                        switch ($t["nombre_estatus"]) {
+
+                            case 'En proceso':
+                                echo '<span class="badge bg-warning">En proceso</span>';
+                                break;
+
+                            case 'Cerrado':
+                                echo '<span class="badge bg-success">Cerrado</span>';
+                                break;
+
+                            case 'Pendiente':
+                                echo '<span class="badge bg-info">Pendiente</span>';
+                                break;
+
+                            default:
+                                echo '<span class="badge bg-secondary">Nuevo</span>';
+                        }
+                        ?>
+                    <!-- <?php echo $t['nombre_estatus']; ?> -->
+
                 </td>
 
                 <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico") : ?>
@@ -147,8 +166,8 @@
                         <textarea name="descripcion" class="form-control" placeholder="Describe tu problema con detalle anexando folio(s) de equipo(s)"></textarea>
                     </div>
 
-                    <input type="hidden" id="usuario_id" name="usuario_id" value=<?=$_SESSION["id"] ?>>
-                    <input type="hidden" id="rol" name="rol" value=<?=$_SESSION["rol"] ?>>
+                    <input type="hidden" id="usuario_id" name="usuario_id" value=<?= $_SESSION["id"] ?>>
+                    <input type="hidden" id="rol" name="rol" value=<?= $_SESSION["rol"] ?>>
 
                 </form>
 
@@ -181,6 +200,8 @@
 
 <script>
     $('#tabla').DataTable({
+        "scrollX": true,
+        
         language: {
             url: 'assets/datatables/es-ES.json',
         },

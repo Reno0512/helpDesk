@@ -33,6 +33,21 @@
                     </p>
 
                     <p>
+                        <b>Reportante:</b>
+                        <?php echo $ticket["reportante"]; ?>
+                    </p>
+
+                    <p>
+                        <b>Area:</b>
+                        <?php echo $ticket["nombre_area"]; ?>
+                    </p>
+
+                    <p>
+                        <b>Fecha Reporte:</b>
+                        <?php echo $ticket["fecha"]; ?>
+                    </p>
+
+                    <p>
                         <b>Prioridad:</b>
 
                         <?php
@@ -57,10 +72,14 @@
                         <b>Estatus:</b>
 
                         <?php
-                        switch ($ticket["estatus"]) {
+                        switch ($ticket["nombre_estatus"]) {
 
                             case 'En proceso':
                                 echo '<span class="badge bg-warning">En proceso</span>';
+                                break;
+
+                            case 'Cerrado':
+                                echo '<span class="badge bg-success">Cerrado</span>';
                                 break;
 
                             case 'Cerrado':
@@ -75,9 +94,7 @@
 
                 </div>
             </div>
-
         </div>
-
 
 
         <!-- ACTUALIZAR -->
@@ -107,21 +124,17 @@
                                 Cambiar Estatus
                             </label>
 
-                            <select
-                                id="estatus"
-                                name="estatus"
-                                class="form-control">
+                            <select id="estatus" class="form-control" name="estatus" required>
+                                <option value="" disabled>Selecciona un Estatus</option>
 
-                                <option value="Nuevo">Nuevo</option>
-                                <option value="En proceso">En proceso</option>
-                                <option value="Pendiente">Pendiente</option>
-                                <option value="Cerrado">Cerrado</option>
-
+                                <?php foreach ($estatus_cat as $status): ?>
+                                    <option value="<?php echo $status['id_estatus']; ?>" <?php echo ($status['id_estatus'] == $ticket['estatus_id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($status['nombre']); ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
 
                         </div>
-
-
 
                         <div class="mb-3">
 
@@ -191,9 +204,50 @@
 
                 </div>
             </div>
+        </div>
+        
+
+        <div class="card mt-4">
+
+            <div class="card-header">
+                Historial
+            </div>
+
+            <div class="card-body">
+
+                <?php while ($h = $historial->fetch_assoc()) { ?>
+
+                    <div class="border-start border-primary ps-3 mb-4">
+
+                        <h6>
+                            <?php echo $h["nombre_estatus"]; ?>
+                        </h6>
+
+                        <p>
+                            <?php echo nl2br($h["comentario"]); ?>
+                        </p>
+
+                        <small>
+
+                            <?php echo $h["usuario"]; ?>
+
+                            |
+
+                            <?php echo $h["fecha"]; ?>
+
+                        </small>
+
+                    </div>
+
+                <?php } ?>
+
+            </div>
 
         </div>
+
     </div>
+
+
 
 </div>
 
