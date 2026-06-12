@@ -1,6 +1,8 @@
 <?php include 'app/views/layouts/header.php'; ?>
 <?php include 'app/views/layouts/sidebar.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
 <div class="container-fluid">
 
     <h3 class="mb-4">
@@ -8,6 +10,26 @@
         <?php echo $ticket["folio"]; ?>
     </h3>
 
+    <?php if (isset($_SESSION['mensaje'])): ?>
+
+        <div class="alert alert-<?php echo $_SESSION['tipo_mensaje']; ?> alert-dismissible fade show mt-3">
+
+            <?php echo $_SESSION['mensaje']; ?>
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert">
+            </button>
+
+        </div>
+
+        <?php
+        unset($_SESSION['mensaje']);
+        unset($_SESSION['tipo_mensaje']);
+        ?>
+
+    <?php endif; ?>
 
     <div class="row">
 
@@ -82,8 +104,8 @@
                                 echo '<span class="badge bg-success">Cerrado</span>';
                                 break;
 
-                            case 'Cerrado':
-                                echo '<span class="badge bg-success">Cerrado</span>';
+                            case 'Pendiente':
+                                echo '<span class="badge bg-info">Pendiente</span>';
                                 break;
 
                             default:
@@ -115,6 +137,7 @@
                         <input
                             type="hidden"
                             name="ticket_id"
+                            id="ticket_id"
                             value="<?php echo $ticket['id']; ?>">
 
 
@@ -132,6 +155,31 @@
                                         <?php echo htmlspecialchars($status['nombre']); ?>
                                     </option>
                                 <?php endforeach; ?>
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label>
+                                Cambiar Prioridad
+                            </label>
+
+                            <select id="prioridad" class="form-control" name="prioridad" required>
+                                <option value="" disabled>Selecciona una Prioridad</option>
+
+                                <option value="<?php echo 'Baja' ?>" <?php echo ('Baja' == $ticket['prioridad']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars('Baja'); ?>
+                                </option>
+
+                                <option value="<?php echo 'Media' ?>" <?php echo ('Media' == $ticket['prioridad']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars('Media'); ?>
+                                </option>
+
+                                <option value="<?php echo 'Alta' ?>" <?php echo ('Alta' == $ticket['prioridad']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars('Alta'); ?>
+                                </option>
+
                             </select>
 
                         </div>
@@ -190,6 +238,31 @@
                         </button>
 
                         <button
+                            id="btnFirmar"
+                            type="button"
+                            class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalFirma"
+                            style="display:none;">
+
+                            Firmar Ticket
+
+                        </button>
+
+                        <?php if ($ticket["nombre_estatus"] == "Cerrado") { ?>
+
+                            <a
+                                href="/pdf_ticket/<?php echo $ticket["id"]; ?>"
+                                target="_blank"
+                                class="btn btn-danger">
+
+                                Ver PDF de Cierre
+
+                            </a>
+
+                        <?php } ?>
+
+                        <!-- <button
                             id="btnCerrar"
                             type="submit"
                             formaction="/cerrar_ticket"
@@ -198,14 +271,14 @@
 
                             Cerrar Ticket
 
-                        </button>
+                        </button> -->
 
                     </form>
 
                 </div>
             </div>
         </div>
-        
+
 
         <div class="card mt-4">
 
@@ -213,7 +286,7 @@
                 Historial
             </div>
 
-            <div class="card-body">
+            <div class="card-body" style="max-height: 250px; overflow-y: auto;">
 
                 <?php while ($h = $historial->fetch_assoc()) { ?>
 
@@ -247,7 +320,77 @@
 
     </div>
 
+</div>
 
+<div
+    class="modal fade"
+    id="modalFirma">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5>
+                    Firma de conformidad
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Cerrar">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <canvas
+                    id="firmaSolicitante"
+                    style="
+                        border:1px solid #ccc;
+                        width:100%;
+                        height:250px;">
+                </canvas>
+
+            </div>
+
+            <div class="modal-footer justify-content-center">
+
+                <button
+                    type="button"
+                    id="btnLimpiarFirma"
+                    class="btn btn-success">
+
+                    Limpiar Firma
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="button"
+                    id="guardarFirma"
+                    class="btn btn-danger">
+
+                    Firmar y Cerrar Ticket
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -272,7 +415,9 @@
 
         $("#estatus").change(function() {
 
-            let estatus = $(this).val();
+            let estatus = $(this).find('option:selected').text().trim();
+
+            console.log(estatus);
 
             if (estatus == "Cerrado") {
 
@@ -280,7 +425,7 @@
 
                 $("#btnSeguimiento").hide();
 
-                $("#btnCerrar").show();
+                $("#btnFirmar").show();
 
             } else {
 
@@ -288,11 +433,132 @@
 
                 $("#btnSeguimiento").show();
 
-                $("#btnCerrar").hide();
+                $("#btnFirmar").hide();
 
             }
 
         });
 
+        setTimeout(function() {
+
+            $(".alert").fadeOut(
+                500,
+                function() {
+                    $(this).remove();
+                }
+            );
+
+        }, 3000);
+
     });
+
+    let firma;
+
+    $('#modalFirma').on('shown.bs.modal', function() {
+
+        const canvas =
+            document.getElementById("firmaSolicitante");
+
+        canvas.width =
+            canvas.offsetWidth;
+
+        canvas.height = 250;
+
+        firma =
+            new SignaturePad(canvas);
+
+    });
+
+    $(document).on('click', '#btnLimpiarFirma', function() {
+
+        if (firma) {
+
+            firma.clear();
+
+        }
+
+    });
+
+
+    $("#guardarFirma").click(function() {
+
+        if (firma.isEmpty()) {
+
+            alert(
+                "Debe capturar la firma."
+            );
+
+            return;
+        }
+
+        $.ajax({
+
+            url: '/guardar_firma',
+
+            method: 'POST',
+
+            data: {
+
+                ticket_id: $("#ticket_id").val(),
+
+                firma: firma.toDataURL()
+
+            },
+
+            success: function(response) {
+
+                // window.location.href =
+                //     "/pdf_ticket/" +
+                //     $("#ticket_id").val();
+
+                // window.open(
+                //     "/pdf_ticket/" + $("#ticket_id").val(),
+                //     "_blank"
+                // );
+
+                // location.reload();
+
+                let ticket =
+                    $("#ticket_id").val();
+
+                // Abrir PDF
+                window.open(
+                    "/pdf_ticket/" + ticket,
+                    "_blank"
+                );
+
+                // Recargar ticket actual
+                location.reload();
+
+            }
+
+        });
+    });
+
+
+
+    // $("#guardarFirma").click(function() {
+
+    //     $.post(
+    //         "/cerrar_ticket", {
+    //             ticket_id: $("input[name=ticket_id]").val(),
+
+    //             comentario: $("textarea[name=comentario]").val(),
+
+    //             solucion: $("textarea[name=solucion]").val(),
+
+    //             observaciones: $("textarea[name=observaciones]").val(),
+
+    //             firma: firma.toDataURL()
+    //         },
+    //         function() {
+
+    //             window.location.href =
+    //                 "/pdf_ticket/" +
+    //                 $("input[name=ticket_id]").val();
+
+    //         }
+    //     );
+
+    // });
 </script>

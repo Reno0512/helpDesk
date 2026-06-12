@@ -62,14 +62,23 @@ switch (true) {
 
         break;
 
+    case $uri == 'guardar_firma':
 
-    case $uri == 'cerrar_ticket':
+        require './app/controllers/TicketController.php';
 
-        require __DIR__ . '/../app/controllers/TicketController.php';
-
-        cerrarTicket();
+        guardarFirmaSolicitante();
 
         break;
+
+
+
+    // case $uri == 'cerrar_ticket':
+
+    //     require __DIR__ . '/../app/controllers/TicketController.php';
+
+    //     cerrarTicket();
+
+    //     break;
 
     case preg_match(
         '/^pdf_ticket\/([0-9]+)$/',

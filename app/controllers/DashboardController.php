@@ -23,7 +23,7 @@ $enProceso=$row['total'];
 
 $sql="SELECT count(*) total
 FROM tickets
-WHERE estatus_id=3";
+WHERE estatus_id=4";
 
 $res=$conn->query($sql);
 $row=$res->fetch_assoc();

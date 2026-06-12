@@ -107,7 +107,9 @@
     <div class="contenido">
         <div class="encabezado">
             Área: Dirección de Informática <br>
-            Taxco de Alarcón, Guerrero a <span><?php date_default_timezone_set('America/Mexico_City'); $meses = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; echo date('j') . " de " . $meses[date('n')] . " de " . date('Y');?></span> <br>
+            Taxco de Alarcón, Guerrero a <span><?php date_default_timezone_set('America/Mexico_City');
+                                                $meses = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                                                echo date('j') . " de " . $meses[date('n')] . " de " . date('Y'); ?></span> <br>
             “2026, Año de Margarita Maza Parada” <br>
         </div>
 
@@ -141,7 +143,11 @@
                 </td>
                 <td class="col-firma">
                     <!-- Espacio vacío para que el usuario firme a mano en el PDF impreso o digitalizado -->
-                    <div class="contenedor-firma-digital"></div>
+                    <div class="contenedor-firma-digital">
+                        <img
+                            src="<?php echo $firma['firma_solicitante']; ?>"
+                            style="width:200px;">
+                    </div>
                     <div class="linea-firma">Firma Usuario</div>
                 </td>
             </tr>

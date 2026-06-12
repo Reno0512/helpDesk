@@ -50,6 +50,7 @@
 
                 <td>
                     <?php
+                    
                         switch ($t["nombre_estatus"]) {
 
                             case 'En proceso':
@@ -57,7 +58,7 @@
                                 break;
 
                             case 'Cerrado':
-                                echo '<span class="badge bg-success">Cerrado</span>';
+                                echo '<span class="badge bg-danger">Cerrado</span>';
                                 break;
 
                             case 'Pendiente':

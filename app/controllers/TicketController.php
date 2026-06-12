@@ -76,6 +76,7 @@ function guardarSeguimiento()
 
     $ticket_id = $_POST["ticket_id"];
     $estatus = $_POST["estatus"];
+    $prioridad = $_POST["prioridad"];
 
     $comentario = trim($_POST["comentario"]);
 
@@ -85,7 +86,7 @@ function guardarSeguimiento()
 
     $actualizar = $conn->query("
         UPDATE tickets
-        SET estatus_id='$estatus'
+        SET estatus_id='$estatus', prioridad='$prioridad'
         WHERE id=$ticket_id
     ");
 
@@ -125,74 +126,139 @@ function guardarSeguimiento()
     exit;
 }
 
-function cerrarTicket()
+// function cerrarTicket()
+// {
+//     global $conn;
+
+//     $ticket_id = $_POST["ticket_id"];
+
+//     $comentario = $_POST["comentario"];
+
+//     $solucion = $_POST["solucion"];
+
+//     $observaciones = $_POST["observaciones"];
+
+
+//     $conn->query("
+//     UPDATE tickets
+//     SET
+//         estatus='4',
+//         fecha_cierre=NOW()
+//     WHERE id=$ticket_id
+//     ");
+
+
+//     $conn->query("
+//     INSERT INTO ticket_historial(
+//         ticket_id,
+//         comentario,
+//         estatus,
+//         usuario
+//     )
+//     VALUES(
+//         $ticket_id,
+//         '$comentario',
+//         '4',
+//         '{$_SESSION['usuario']}'
+//     )
+//     ");
+
+
+//     $conn->query("
+//     INSERT INTO ticket_cierre(
+//         ticket_id,
+//         solucion,
+//         observaciones
+//     )
+//     VALUES(
+//         $ticket_id,
+//         '$solucion',
+//         '$observaciones'
+//     )
+//     ");
+
+//     // echo "
+//     // <script>
+
+//     //     window.open(
+//     //         '/pdf_ticket/$ticket_id',
+//     //         '_blank'
+//     //     );
+
+//     //     window.location.href =
+//     //         '/ver_ticket/$ticket_id';
+
+//     // </script>
+//     // ";
+
+//     header(
+//         "Location:/pdf_ticket/$ticket_id"
+//     );
+// }
+
+
+function guardarFirmaSolicitante()
 {
     global $conn;
 
-    $ticket_id = $_POST["ticket_id"];
+    $ticket_id =
+        $_POST["ticket_id"];
 
-    $comentario = $_POST["comentario"];
+    $firma =
+        $_POST["firma"];
 
-    $solucion = $_POST["solucion"];
+    $firma =
+        str_replace(
+            'data:image/png;base64,',
+            '',
+            $firma
+        );
 
-    $observaciones = $_POST["observaciones"];
+    $firma =
+        str_replace(
+            ' ',
+            '+',
+            $firma
+        );
 
+    $data =
+        base64_decode($firma);
 
-    $conn->query("
-    UPDATE tickets
-    SET
-        estatus='Cerrado',
-        fecha_cierre=NOW()
-    WHERE id=$ticket_id
-    ");
+    $archivo =
+        './uploads/firmas/' .
+        'solicitante_' .
+        $ticket_id .
+        '.png';
 
-
-    $conn->query("
-    INSERT INTO ticket_historial(
-        ticket_id,
-        comentario,
-        estatus,
-        usuario
-    )
-    VALUES(
-        $ticket_id,
-        '$comentario',
-        'Cerrado',
-        '{$_SESSION['usuario']}'
-    )
-    ");
-
-
-    $conn->query("
-    INSERT INTO ticket_cierre(
-        ticket_id,
-        solucion,
-        observaciones
-    )
-    VALUES(
-        $ticket_id,
-        '$solucion',
-        '$observaciones'
-    )
-    ");
-
-    // echo "
-    // <script>
-
-    //     window.open(
-    //         '/pdf_ticket/$ticket_id',
-    //         '_blank'
-    //     );
-
-    //     window.location.href =
-    //         '/ver_ticket/$ticket_id';
-
-    // </script>
-    // ";
-
-    header(
-        "Location:/pdf_ticket/$ticket_id"
+    file_put_contents(
+        $archivo,
+        $data
     );
+
+    $conn->query("
+        INSERT INTO ticket_firmas(
+            ticket_id,
+            firma_solicitante
+        )
+        VALUES(
+            $ticket_id,
+            '$archivo'
+        )
+    ");
+
+    $conn->query("
+        UPDATE tickets
+        SET
+            estatus_id='4',
+            fecha_cierre=NOW()
+        WHERE id=$ticket_id
+    ");
+
+    echo json_encode([
+        'ok' => true
+    ]);
+
+    exit;
 }
 
 
@@ -204,13 +270,22 @@ use Dompdf\Options;
 
 function generarPDF()
 {
+
     global $conn;
 
     $id = $_GET["id"];
 
     $ticket = $conn->query("
-        SELECT folio,areas.nombre AS area, titulo,descripcion,estatus,fecha_cierre,solucion FROM tickets inner join ticket_cierre on tickets.id=ticket_cierre.ticket_id inner join cat_areas areas on tickets.area_id=areas.id_area WHERE tickets.id=$id
+        SELECT folio, a.nombre AS area, titulo, descripcion, e.nombre AS estatus, fecha_cierre,solucion 
+FROM tickets t
+INNER JOIN ticket_cierre tc on t.id=tc.ticket_id 
+INNER JOIN cat_areas a on t.area_id=a.id_area 
+INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus 
+WHERE t.id=$id
     ")->fetch_assoc();
+
+    var_dump($ticket);
+    exit;
 
     ob_start();
 
@@ -220,6 +295,14 @@ function generarPDF()
     $rutaImagen = $rutaRaizProyecto . '/assets/img/membrete.png';
 
     $rutaFirma = $rutaRaizProyecto . '/assets/img/firmaRodo.png';
+
+    $firma = $conn->query("
+    SELECT *
+    FROM ticket_firmas
+    WHERE ticket_id=$id
+    ORDER BY id DESC
+    LIMIT 1
+")->fetch_assoc();
 
     include './app/views/pdf/cierre_ticket.php';
 
@@ -244,62 +327,71 @@ function generarPDF()
         ob_end_clean();
     }
 
+
     $dompdf->stream(
         "Ticket_" . $ticket["folio"] . ".pdf",
         ["Attachment" => false]
     );
+
+    $pdf = "uploads/pdf/Ticket_" . $ticket["folio"] . ".pdf";
+
+    $conn->query("
+UPDATE tickets
+SET pdf_cierre='$pdf'
+WHERE id=$id
+");
 }
 
 
-function pdfTest()
-{
+// function pdfTest()
+// {
 
-    // 2. Configurar opciones esenciales para imágenes
-    $options = new Options();
-    $options->set('isHtml5ParserEnabled', true);
-    $options->set('isRemoteEnabled', true); // Requerido para URLs y rutas con http://
+//     // 2. Configurar opciones esenciales para imágenes
+//     $options = new Options();
+//     $options->set('isHtml5ParserEnabled', true);
+//     $options->set('isRemoteEnabled', true); // Requerido para URLs y rutas con http://
 
-    $dompdf = new Dompdf($options);
+//     $dompdf = new Dompdf($options);
 
-    /// Sube 2 niveles para obtener la raíz de tu proyecto
-    $rutaRaizProyecto = dirname(__DIR__, 2);
+//     /// Sube 2 niveles para obtener la raíz de tu proyecto
+//     $rutaRaizProyecto = dirname(__DIR__, 2);
 
-    // AUTORIZACIÓN: Permite a Dompdf leer archivos dentro de la raíz de tu proyecto
-    $options->setChroot($rutaRaizProyecto);
+//     // AUTORIZACIÓN: Permite a Dompdf leer archivos dentro de la raíz de tu proyecto
+//     $options->setChroot($rutaRaizProyecto);
 
-    $dompdf = new Dompdf($options);
+//     $dompdf = new Dompdf($options);
 
-    // Tu ruta exacta hacia la imagen
-    $rutaImagen = $rutaRaizProyecto . '/assets/img/JumilOficial.png';
+//     // Tu ruta exacta hacia la imagen
+//     $rutaImagen = $rutaRaizProyecto . '/assets/img/JumilOficial.png';
 
-    // 5. Crear el HTML
-    $html = '
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: sans-serif; }
-        .logo { width: 150px; height: auto; }
-    </style>
-</head>
-<body>
-    <h1>Reporte con Imagen</h1>
-    <!-- Usamos la variable con la ruta absoluta -->
-    <img class="logo" src="' . $rutaImagen . '" alt="Logo">
-</body>
-</html>
-';
+//     // 5. Crear el HTML
+//     $html = '
+// <!DOCTYPE html>
+// <html lang="es">
+// <head>
+//     <meta charset="UTF-8">
+//     <style>
+//         body { font-family: sans-serif; }
+//         .logo { width: 150px; height: auto; }
+//     </style>
+// </head>
+// <body>
+//     <h1>Reporte con Imagen</h1>
+//     <!-- Usamos la variable con la ruta absoluta -->
+//     <img class="logo" src="' . $rutaImagen . '" alt="Logo">
+// </body>
+// </html>
+// ';
 
-    // 5. Renderizar y mostrar el PDF
-    $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->render();
+//     // 5. Renderizar y mostrar el PDF
+//     $dompdf->loadHtml($html);
+//     $dompdf->setPaper('A4', 'portrait');
+//     $dompdf->render();
 
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
+//     while (ob_get_level()) {
+//         ob_end_clean();
+//     }
 
-    // Forzar la descarga del PDF en el navegador
-    $dompdf->stream("documento.pdf", ["Attachment" => false]);
-}
+//     // Forzar la descarga del PDF en el navegador
+//     $dompdf->stream("documento.pdf", ["Attachment" => false]);
+// }
