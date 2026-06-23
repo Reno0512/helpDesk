@@ -5,7 +5,7 @@
 <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico") : ?>
     <div class="row">
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow">
                 <div class="card-body">
 
@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card shadow">
                 <div class="card-body">
                     <h3>
@@ -32,7 +32,20 @@
             </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3>
+                        <?php echo $pendientes; ?>
+                    </h3>
+
+                    Tickets Pendientes
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
             <div class="card shadow">
                 <div class="card-body">
                     <h3>

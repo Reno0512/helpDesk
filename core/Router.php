@@ -43,6 +43,7 @@ switch (true) {
         require __DIR__ . '/../app/controllers/TicketController.php';
         guardarSeguimiento();
         break;
+
     // case $uri == 'ver_ticket/':
     //     require './app/controllers/TicketController.php';
     //     verTicket();
@@ -70,13 +71,43 @@ switch (true) {
 
         break;
 
+    case $uri == 'guardar_firma_remoto':
+
+        require './app/controllers/TicketController.php';
+
+        guardarFirmaRemoto();
+
+        break;
 
 
+    case $uri == 'firma_ticket':
+
+        require './app/controllers/TicketController.php';
+
+        firmaTicket();
+
+        break;
+
+
+    case $uri == 'firma_exitosa':
+
+        require './app/views/tickets/firma_exitosa.php';
+
+        break;
     // case $uri == 'cerrar_ticket':
 
     //     require __DIR__ . '/../app/controllers/TicketController.php';
 
     //     cerrarTicket();
+
+    //     break;
+
+
+    // case $uri == 'solicitar_firma':
+
+    //     require './app/controllers/TicketController.php';
+
+    //     solicitarFirma();
 
     //     break;
 

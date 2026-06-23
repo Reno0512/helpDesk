@@ -3,266 +3,313 @@
 
 <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
+
 <div class="container-fluid">
 
-    <h3 class="mb-4">
-        Ticket:
-        <?php echo $ticket["folio"]; ?>
-    </h3>
+	<h3 class="mb-4">
+		Ticket:
+		<?php echo $ticket["folio"]; ?>
+	</h3>
 
-    <?php if (isset($_SESSION['mensaje'])): ?>
+	<?php if (isset($_SESSION['mensaje'])): ?>
 
-        <div class="alert alert-<?php echo $_SESSION['tipo_mensaje']; ?> alert-dismissible fade show mt-3">
+		<div class="alert alert-<?php echo $_SESSION['tipo_mensaje']; ?> alert-dismissible fade show mt-3">
 
-            <?php echo $_SESSION['mensaje']; ?>
+			<?php echo $_SESSION['mensaje']; ?>
 
-            <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert">
-            </button>
+			<button
+				type="button"
+				class="btn-close"
+				data-bs-dismiss="alert">
+			</button>
 
-        </div>
+		</div>
 
-        <?php
-        unset($_SESSION['mensaje']);
-        unset($_SESSION['tipo_mensaje']);
-        ?>
+		<?php
+		unset($_SESSION['mensaje']);
+		unset($_SESSION['tipo_mensaje']);
+		?>
 
-    <?php endif; ?>
+	<?php endif; ?>
 
-    <div class="row">
+	<div class="row">
 
-        <!-- INFORMACION TICKET -->
-        <div class="col-md-6">
+		<!-- INFORMACION TICKET -->
+		<div class="col-md-6">
 
-            <div class="card shadow mb-4">
+			<div class="card shadow mb-4">
 
-                <div class="card-header bg-primary text-white">
-                    Información Ticket
-                </div>
+				<div class="card-header bg-primary text-white">
+					Información Ticket
+				</div>
 
-                <div class="card-body">
+				<div class="card-body">
 
-                    <h4>
-                        <?php echo $ticket["titulo"]; ?>
-                    </h4>
+					<h4>
+						<?php echo $ticket["titulo"]; ?>
+					</h4>
 
-                    <hr>
+					<hr>
 
-                    <p>
-                        <?php echo $ticket["descripcion"]; ?>
-                    </p>
+					<p>
+						<b>Descripción:</b>
+						<?php echo $ticket["descripcion"]; ?>
+					</p>
 
-                    <p>
-                        <b>Reportante:</b>
-                        <?php echo $ticket["reportante"]; ?>
-                    </p>
+					<p>
+						<b>Reportante:</b>
+						<?php echo $ticket["reportante"]; ?>
+					</p>
 
-                    <p>
-                        <b>Area:</b>
-                        <?php echo $ticket["nombre_area"]; ?>
-                    </p>
+					<p>
+						<b>Area:</b>
+						<?php echo $ticket["nombre_area"]; ?>
+					</p>
 
-                    <p>
-                        <b>Fecha Reporte:</b>
-                        <?php echo $ticket["fecha"]; ?>
-                    </p>
+					<p>
+						<b>Fecha Reporte:</b>
+						<?php echo $ticket["fecha"]; ?>
+					</p>
 
-                    <p>
-                        <b>Prioridad:</b>
+					<p>
+						<b>Prioridad:</b>
 
-                        <?php
-                        switch ($ticket["prioridad"]) {
+						<?php
+						switch ($ticket["prioridad"]) {
 
-                            case 'Alta':
-                                echo '<span class="badge bg-danger">Alta</span>';
-                                break;
+							case 'Alta':
+								echo '<span class="badge bg-danger">Alta</span>';
+								break;
 
-                            case 'Media':
-                                echo '<span class="badge bg-warning">Media</span>';
-                                break;
+							case 'Media':
+								echo '<span class="badge bg-warning">Media</span>';
+								break;
 
-                            default:
-                                echo '<span class="badge bg-success">Baja</span>';
-                        }
-                        ?>
-                    </p>
+							default:
+								echo '<span class="badge bg-success">Baja</span>';
+						}
+						?>
+					</p>
 
 
-                    <p>
-                        <b>Estatus:</b>
+					<p>
+						<b>Estatus:</b>
 
-                        <?php
-                        switch ($ticket["nombre_estatus"]) {
+						<?php
+						switch ($ticket["nombre_estatus"]) {
 
-                            case 'En proceso':
-                                echo '<span class="badge bg-warning">En proceso</span>';
-                                break;
+							case 'En proceso':
+								echo '<span class="badge bg-warning">En proceso</span>';
+								break;
 
-                            case 'Cerrado':
-                                echo '<span class="badge bg-success">Cerrado</span>';
-                                break;
+							case 'Cerrado':
+								echo '<span class="badge bg-danger">Cerrado</span>';
+								break;
 
-                            case 'Pendiente':
-                                echo '<span class="badge bg-info">Pendiente</span>';
-                                break;
+							case 'Pendiente':
+								echo '<span class="badge bg-info">Pendiente</span>';
+								break;
 
-                            default:
-                                echo '<span class="badge bg-secondary">Nuevo</span>';
-                        }
-                        ?>
-                    </p>
+							default:
+								echo '<span class="badge bg-secondary">Nuevo</span>';
+						}
+						?>
+					</p>
 
-                </div>
-            </div>
-        </div>
+					<?php if (!empty($ticket["evidencia"])): ?>
 
+						<p class="mt-3">
 
-        <!-- ACTUALIZAR -->
-        <div class="col-md-6">
+							<b>Evidencia:</b>
 
-            <div class="card shadow mb-4">
+							<br>
 
-                <div class="card-header bg-dark text-white">
-                    Seguimiento
-                </div>
+							<img
+								id="imagenGrande"
+								src="../uploads/tickets/<?php echo $ticket["evidencia"]; ?>"
+								class="img-fluid rounded border"
+								style="max-height:250px; cursor:pointer;"
+								onclick="verImagen(this.src)">
 
-                <div class="card-body">
+						</p>
 
-                    <form
-                        action="/actualizar_ticket"
-                        method="POST">
+					<?php endif; ?>
 
-                        <input
-                            type="hidden"
-                            name="ticket_id"
-                            id="ticket_id"
-                            value="<?php echo $ticket['id']; ?>">
+				</div>
+			</div>
+		</div>
 
 
-                        <div class="mb-3">
+		<div class="col-md-6">
 
-                            <label>
-                                Cambiar Estatus
-                            </label>
+			<div class="card shadow mb-4">
 
-                            <select id="estatus" class="form-control" name="estatus" required>
-                                <option value="" disabled>Selecciona un Estatus</option>
+				<div class="card-header bg-dark text-white">
+					Seguimiento
+				</div>
 
-                                <?php foreach ($estatus_cat as $status): ?>
-                                    <option value="<?php echo $status['id_estatus']; ?>" <?php echo ($status['id_estatus'] == $ticket['estatus_id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($status['nombre']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+				<div class="card-body">
 
-                        </div>
+					<form
+						action="/actualizar_ticket"
+						method="POST"
+						id="segForm"
+						enctype="multipart/form-data">
 
-                        <div class="mb-3">
+						<input type="hidden" name="ticket_id" id="ticket_id" value="<?php echo $ticket['id']; ?>">
 
-                            <label>
-                                Cambiar Prioridad
-                            </label>
+						<div class="mb-3">
 
-                            <select id="prioridad" class="form-control" name="prioridad" required>
-                                <option value="" disabled>Selecciona una Prioridad</option>
+							<label>
+								Cambiar Estatus
+							</label>
 
-                                <option value="<?php echo 'Baja' ?>" <?php echo ('Baja' == $ticket['prioridad']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars('Baja'); ?>
-                                </option>
+							<select id="estatus" class="form-control" name="estatus" required>
+								<option value="" disabled>Selecciona un Estatus</option>
 
-                                <option value="<?php echo 'Media' ?>" <?php echo ('Media' == $ticket['prioridad']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars('Media'); ?>
-                                </option>
+								<?php foreach ($estatus_cat as $status): ?>
+									<option value="<?php echo $status['id_estatus']; ?>" <?php echo ($status['id_estatus'] == $ticket['estatus_id']) ? 'selected' : ''; ?>>
+										<?php echo htmlspecialchars($status['nombre']); ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
 
-                                <option value="<?php echo 'Alta' ?>" <?php echo ('Alta' == $ticket['prioridad']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars('Alta'); ?>
-                                </option>
+						</div>
 
-                            </select>
+						<div class="mb-3">
 
-                        </div>
+							<label>
+								Cambiar Prioridad
+							</label>
 
-                        <div class="mb-3">
+							<select id="prioridad" class="form-control" name="prioridad" required>
+								<option value="" disabled>Selecciona una Prioridad</option>
 
-                            <label>
-                                Comentario Técnico
-                            </label>
+								<option value="<?php echo 'Baja' ?>" <?php echo ('Baja' == $ticket['prioridad']) ? 'selected' : ''; ?>>
+									<?php echo htmlspecialchars('Baja'); ?>
+								</option>
 
-                            <textarea
-                                name="comentario"
-                                class="form-control"
-                                rows="2"></textarea>
+								<option value="<?php echo 'Media' ?>" <?php echo ('Media' == $ticket['prioridad']) ? 'selected' : ''; ?>>
+									<?php echo htmlspecialchars('Media'); ?>
+								</option>
 
-                        </div>
+								<option value="<?php echo 'Alta' ?>" <?php echo ('Alta' == $ticket['prioridad']) ? 'selected' : ''; ?>>
+									<?php echo htmlspecialchars('Alta'); ?>
+								</option>
 
-                        <div id="panelCierre" style="display:none;">
+							</select>
 
-                            <div class="mb-3">
+						</div>
 
-                                <label>
-                                    Solución Aplicada
-                                </label>
+						<div class="mb-3">
 
-                                <textarea
-                                    name="solucion"
-                                    class="form-control"
-                                    rows="2"></textarea>
+							<label>
+								Comentario Técnico
+							</label>
 
-                            </div>
+							<textarea
+								name="comentario"
+								class="form-control primera-mayuscula"
+								rows="2"></textarea>
 
+						</div>
 
-                            <div class="mb-3">
+						<div class="mb-3">
 
-                                <label>
-                                    Observaciones
-                                </label>
+							<label>
+								Evidencia Fotográfica
+							</label>
 
-                                <textarea
-                                    name="observaciones"
-                                    class="form-control"
-                                    rows="2"></textarea>
+							<input
+								type="file"
+								name="imagen"
+								class="form-control"
+								accept="image/*">
 
-                            </div>
+							<small class="text-muted">
+								Selecciona una imagen.
+							</small>
 
-                        </div>
+						</div>
 
-                        <button
-                            id="btnSeguimiento"
-                            type="submit"
-                            class="btn btn-primary">
+						<div id="panelCierre" style="display:none;">
 
-                            Guardar Seguimiento
+							<div class="mb-3">
 
-                        </button>
+								<label>
+									Solución Aplicada
+								</label>
 
-                        <button
-                            id="btnFirmar"
-                            type="button"
-                            class="btn btn-danger"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalFirma"
-                            style="display:none;">
+								<textarea
+									name="solucion"
+									class="form-control primera-mayuscula"
+									rows="2"></textarea>
 
-                            Firmar Ticket
+							</div>
 
-                        </button>
 
-                        <?php if ($ticket["nombre_estatus"] == "Cerrado") { ?>
+							<div class="mb-3">
 
-                            <a
-                                href="/pdf_ticket/<?php echo $ticket["id"]; ?>"
-                                target="_blank"
-                                class="btn btn-danger">
+								<label>
+									Observaciones
+								</label>
 
-                                Ver PDF de Cierre
+								<textarea
+									name="observaciones"
+									class="form-control primera-mayuscula"
+									rows="2"></textarea>
 
-                            </a>
+							</div>
 
-                        <?php } ?>
+						</div>
 
-                        <!-- <button
+						<button
+							id="btnSeguimiento"
+							type="submit"
+							class="btn btn-primary mb-3">
+
+							Guardar Seguimiento
+
+						</button>
+
+						<button
+							id="btnFirmar"
+							type="button"
+							class="btn btn-danger"
+							data-bs-toggle="modal"
+							data-bs-target="#modalFirma"
+							style="display:none;">
+
+							Firmar Ticket
+
+						</button>
+
+						<button
+							id="btnSolicitarFirma"
+							type="button"
+							class="btn btn-success"
+							style="display:none;">
+
+							Solicitar Firma
+
+						</button>
+
+						<?php if ($ticket["nombre_estatus"] == "Cerrado") { ?>
+							<a
+								href="https://sti.taxco.gob.mx/pdf_ticket/<?php echo $ticket["id"]; ?>"
+								target="_blank"
+								class="btn btn-danger">
+
+								Ver PDF de Cierre
+
+							</a>
+
+						<?php } ?>
+
+						<!-- <button
                             id="btnCerrar"
                             type="submit"
                             formaction="/cerrar_ticket"
@@ -273,292 +320,499 @@
 
                         </button> -->
 
-                    </form>
+					</form>
 
-                </div>
-            </div>
-        </div>
+				</div>
+			</div>
+		</div>
 
 
-        <div class="card mt-4">
+		<div class="card mt-4">
 
-            <div class="card-header">
-                Historial
-            </div>
+			<div class="card-header">
+				Historial
+			</div>
 
-            <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+			<div class="card-body" style="max-height: 250px; overflow-y: auto;">
 
-                <?php while ($h = $historial->fetch_assoc()) { ?>
+				<?php while ($h = $historial->fetch_assoc()) { ?>
 
-                    <div class="border-start border-primary ps-3 mb-4">
+					<div class="border-start border-primary ps-3 mb-4">
 
-                        <h6>
-                            <?php echo $h["nombre_estatus"]; ?>
-                        </h6>
+						<h6>
+							<?php echo $h["nombre_estatus"]; ?>
+						</h6>
 
-                        <p>
-                            <?php echo nl2br($h["comentario"]); ?>
-                        </p>
+						<p>
+							<?php echo nl2br($h["comentario"]); ?>
+						</p>
 
-                        <small>
+						<?php if (!empty($h["imagen"])) { ?>
 
-                            <?php echo $h["usuario"]; ?>
+							<div class="mt-2">
 
-                            |
+								<a
+									href="<?php echo $h["imagen"]; ?>"
+									target="_blank">
 
-                            <?php echo $h["fecha"]; ?>
+									<img
+										src="<?php echo $h["imagen"]; ?>"
+										class="img-thumbnail"
+										style="max-width:200px;">
 
-                        </small>
+								</a>
 
-                    </div>
+							</div>
 
-                <?php } ?>
+						<?php } ?>
 
-            </div>
+						<small>
 
-        </div>
+							<?php echo $h["usuario"]; ?>
 
-    </div>
+							|
+
+							<?php echo $h["fecha"]; ?>
+
+						</small>
+
+					</div>
+
+				<?php } ?>
+
+			</div>
+
+		</div>
+
+	</div>
 
 </div>
 
 <div
-    class="modal fade"
-    id="modalFirma">
+	class="modal fade"
+	tabindex="-1"
+	id="modalFirma">
 
-    <div class="modal-dialog">
+	<div class="modal-dialog">
 
-        <div class="modal-content">
+		<div class="modal-content">
 
-            <div class="modal-header">
+			<div class="modal-header bg-dark text-white">
 
-                <h5>
-                    Firma de conformidad
-                </h5>
+				<h5>
+					Firma de conformidad
+				</h5>
 
-                <button
+				<!-- <button
                     type="button"
                     class="btn-close"
                     data-bs-dismiss="modal"
                     aria-label="Cerrar">
-                </button>
+                </button> -->
 
-            </div>
+				<button
+					type="button"
+					class="btn-close btn-close-white"
+					data-bs-dismiss="modal">
+				</button>
 
-            <div class="modal-body">
+			</div>
 
-                <canvas
-                    id="firmaSolicitante"
-                    style="
+			<div class="modal-body">
+
+				<canvas
+					id="firmaSolicitante"
+					style="
                         border:1px solid #ccc;
                         width:100%;
                         height:250px;">
-                </canvas>
+				</canvas>
 
-            </div>
+			</div>
 
-            <div class="modal-footer justify-content-center">
+			<div class="modal-footer justify-content-center">
 
-                <button
-                    type="button"
-                    id="btnLimpiarFirma"
-                    class="btn btn-success">
+				<button
+					type="button"
+					id="btnLimpiarFirma"
+					class="btn btn-success">
 
-                    Limpiar Firma
+					Limpiar Firma
 
-                </button>
+				</button>
 
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal">
+				<button
+					type="button"
+					class="btn btn-secondary"
+					data-bs-dismiss="modal">
 
-                    Cancelar
+					Cancelar
 
-                </button>
+				</button>
 
-                <button
-                    type="button"
-                    id="guardarFirma"
-                    class="btn btn-danger">
+				<button
+					type="button"
+					id="guardarFirma"
+					class="btn btn-danger">
 
-                    Firmar y Cerrar Ticket
+					Firmar y Cerrar Ticket
 
-                </button>
+				</button>
 
-            </div>
+			</div>
 
-        </div>
+		</div>
 
-    </div>
+	</div>
 
 </div>
 
+<div class="modal fade"
+	id="modalImagen"
+	tabindex="-1"
+	aria-hidden="true">
+
+	<div class="modal-dialog modal-xl modal-dialog-centered">
+
+		<div class="modal-content">
+
+			<div class="modal-header bg-dark text-white">
+				<h5 class="modal-title">
+					Evidencia
+				</h5>
+
+				<button
+					type="button"
+					class="btn-close btn-close-white"
+					data-bs-dismiss="modal">
+				</button>
+
+			</div>
+
+			<div class="modal-body text-center">
+
+				<img
+					id="imagenGrande"
+					src=""
+					class="img-fluid"
+					style="max-height:450px;">
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+<div class="modal fade" id="modalLink">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header  bg-dark text-white">
+				<h5>Enlace de Firma</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+				</button>
+			</div>
+			<div class="modal-body">
+				<input id="linkFirma" class="form-control" readonly>
+			</div>
+			<div class="modal-footer">
+				<button id="btnCopiar" class="btn btn-primary" onclick="copiarLink()">
+					<span id="textoBoton">Copiar</span>
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
-    // $("#estatus").change(function() {
+	// $("#estatus").change(function() {
 
-    //     if ($(this).val() == "Cerrado") {
+	//     if ($(this).val() == "Cerrado") {
 
-    //         $("#btnSeguimiento").hide();
-    //         $("#btnCerrar").show();
+	//         $("#btnSeguimiento").hide();
+	//         $("#btnCerrar").show();
 
-    //     } else {
+	//     } else {
 
-    //         $("#btnSeguimiento").show();
-    //         $("#btnCerrar").hide();
+	//         $("#btnSeguimiento").show();
+	//         $("#btnCerrar").hide();
 
-    //     }
+	//     }
 
-    // });
+	// });
 
-    $(document).ready(function() {
+	$(document).ready(function() {
 
-        $("#estatus").change(function() {
+		$("#estatus").change(function() {
 
-            let estatus = $(this).find('option:selected').text().trim();
+			let estatus = $(this).find('option:selected').text().trim();
 
-            console.log(estatus);
+			// console.log(estatus);
 
-            if (estatus == "Cerrado") {
+			if (estatus == "Cerrado") {
 
-                $("#panelCierre").show();
+				$("#panelCierre").show();
 
-                $("#btnSeguimiento").hide();
+				$("#btnSeguimiento").hide();
 
-                $("#btnFirmar").show();
+				$("#btnFirmar").show();
 
-            } else {
+				$("#btnSolicitarFirma").show();
 
-                $("#panelCierre").hide();
 
-                $("#btnSeguimiento").show();
+			} else {
 
-                $("#btnFirmar").hide();
+				$("#panelCierre").hide();
 
-            }
+				$("#btnSeguimiento").show();
 
-        });
+				$("#btnFirmar").hide();
 
-        setTimeout(function() {
+				$("#btnSolicitarFirma").hide();
 
-            $(".alert").fadeOut(
-                500,
-                function() {
-                    $(this).remove();
-                }
-            );
+			}
 
-        }, 3000);
+		});
 
-    });
+		setTimeout(function() {
 
-    let firma;
+			$(".alert").fadeOut(
+				500,
+				function() {
+					$(this).remove();
+				}
+			);
 
-    $('#modalFirma').on('shown.bs.modal', function() {
+		}, 3000);
 
-        const canvas =
-            document.getElementById("firmaSolicitante");
+	});
 
-        canvas.width =
-            canvas.offsetWidth;
+	let firma;
 
-        canvas.height = 250;
+	$('#modalFirma').on('shown.bs.modal', function() {
 
-        firma =
-            new SignaturePad(canvas);
+		const canvas =
+			document.getElementById("firmaSolicitante");
 
-    });
+		canvas.width =
+			canvas.offsetWidth;
 
-    $(document).on('click', '#btnLimpiarFirma', function() {
+		canvas.height = 250;
 
-        if (firma) {
+		firma =
+			new SignaturePad(canvas);
 
-            firma.clear();
+	});
 
-        }
+	$(document).on('click', '#btnLimpiarFirma', function() {
 
-    });
+		if (firma) {
 
+			firma.clear();
 
-    $("#guardarFirma").click(function() {
+		}
 
-        if (firma.isEmpty()) {
+	});
 
-            alert(
-                "Debe capturar la firma."
-            );
 
-            return;
-        }
+	$("#guardarFirma").click(function() {
 
-        $.ajax({
+		if (firma.isEmpty()) {
 
-            url: '/guardar_firma',
+			alert(
+				"Debe capturar la firma."
+			);
 
-            method: 'POST',
+			return;
+		}
 
-            data: {
+		$.ajax({
 
-                ticket_id: $("#ticket_id").val(),
+			url: '/guardar_firma',
 
-                firma: firma.toDataURL()
+			method: 'POST',
 
-            },
+			data: {
 
-            success: function(response) {
+				ticket_id: $("#ticket_id").val(),
 
-                // window.location.href =
-                //     "/pdf_ticket/" +
-                //     $("#ticket_id").val();
+				comentario: $("#comentario").val(),
+				solucion: $("#solucion").val(),
+				observaciones: $("#observaciones").val(),
 
-                // window.open(
-                //     "/pdf_ticket/" + $("#ticket_id").val(),
-                //     "_blank"
-                // );
+				firma: firma.toDataURL()
 
-                // location.reload();
+			},
 
-                let ticket =
-                    $("#ticket_id").val();
+			success: function(response) {
 
-                // Abrir PDF
-                window.open(
-                    "/pdf_ticket/" + ticket,
-                    "_blank"
-                );
+				// window.location.href =
+				//     "/pdf_ticket/" +
+				//     $("#ticket_id").val();
 
-                // Recargar ticket actual
-                location.reload();
+				// window.open(
+				//     "/pdf_ticket/" + $("#ticket_id").val(),
+				//     "_blank"
+				// );
 
-            }
+				// location.reload();
 
-        });
-    });
+				// // let ticket = $("#ticket_id").val();
 
+				// // Abrir PDF
+				// // window.open("/pdf_ticket/" + ticket, "_blank");
 
+				// Recargar ticket actual
+				location.reload();
 
-    // $("#guardarFirma").click(function() {
+			}
 
-    //     $.post(
-    //         "/cerrar_ticket", {
-    //             ticket_id: $("input[name=ticket_id]").val(),
+		});
+	});
 
-    //             comentario: $("textarea[name=comentario]").val(),
 
-    //             solucion: $("textarea[name=solucion]").val(),
 
-    //             observaciones: $("textarea[name=observaciones]").val(),
+	// $("#guardarFirma").click(function() {
 
-    //             firma: firma.toDataURL()
-    //         },
-    //         function() {
+	//     $.post(
+	//         "/cerrar_ticket", {
+	//             ticket_id: $("input[name=ticket_id]").val(),
 
-    //             window.location.href =
-    //                 "/pdf_ticket/" +
-    //                 $("input[name=ticket_id]").val();
+	//             comentario: $("textarea[name=comentario]").val(),
 
-    //         }
-    //     );
+	//             solucion: $("textarea[name=solucion]").val(),
 
-    // });
+	//             observaciones: $("textarea[name=observaciones]").val(),
+
+	//             firma: firma.toDataURL()
+	//         },
+	//         function() {
+
+	//             window.location.href =
+	//                 "/pdf_ticket/" +
+	//                 $("input[name=ticket_id]").val();
+
+	//         }
+	//     );
+
+	// });
+
+	const viewer = new Viewer(
+		document.getElementById('imagenGrande'), {
+			navbar: false,
+			toolbar: true
+		}
+	);
+
+	// function verImagen(src) {
+
+	//     $("#imagenGrande").attr(
+	//         "src",
+	//         src
+	//     );
+
+	//     const modal =
+	//         new bootstrap.Modal(
+	//             document.getElementById(
+	//                 "modalImagen"
+	//             )
+	//         );
+
+	//     modal.show();
+	// }
+	$('.primera-mayuscula').on('input', function() {
+		let texto = $(this).val();
+		if (texto.length > 0) {
+			// Convierte solo el primer carácter a mayúscula
+			$(this).val(texto.charAt(0).toUpperCase() + texto.slice(1));
+		}
+	});
+
+	$("#btnSolicitarFirma").click(function() {
+
+		let formData = new FormData(document.getElementById("segForm"));
+
+		$.ajax({
+
+			url: "../api/solicitar_firma.php",
+			type: "POST",
+			data: formData,
+			processData: false,
+			contentType: false,
+
+
+			success: function(response) {
+				console.log(response);
+
+				let enlace = window.location.origin + "/firma_ticket?token=" + response;
+
+				$("#linkFirma").val(enlace);
+
+				$("#modalLink").modal("show");
+
+			}
+		});
+	});
+
+	function copiarLink() {
+		// Selecciona los elementos usando selectores de jQuery
+		const inputFirma = $("#linkFirma");
+		const boton = $("#btnCopiar");
+		const textoBoton = $("#textoBoton");
+
+		// Valida si el input está vacío usando .val()
+		if (!inputFirma.val()) return;
+
+		// Copia el enlace al portapapeles
+		navigator.clipboard.writeText(inputFirma.val())
+			.then(() => {
+				// 1. Cambia el diseño a éxito con métodos de jQuery
+				textoBoton.text("¡Copiado!");
+				boton.removeClass("btn-primary")
+					.addClass("btn-success")
+					.prop("disabled", true); // Deshabilita el botón
+
+				// 2. Regresa al estado original después de 2 segundos (2000 ms)
+				setTimeout(() => {
+					textoBoton.text("Copiar");
+					boton.removeClass("btn-success")
+						.addClass("btn-primary")
+						.prop("disabled", false); // Habilita el botón
+				}, 2000);
+			})
+			.catch(err => {
+				console.error("Error al copiar: ", err);
+			});
+	}
+
+
+
+
+	//     $.post(
+	//         "api/solicitar_firma.php", {
+	//             ticket_id: $("#ticket_id").val()
+	//         },
+	//         function(response) {
+
+	//             response =
+	//                 JSON.parse(response);
+
+	//             console.log(response);
+
+	//             // let enlace =
+	//             //     window.location.origin +
+	//             //     "/firma_ticket?token=" +
+	//             //     response.token;
+
+	//             // $("#linkFirma")
+	//             //     .val(enlace);
+
+	//             // $("#modalLink")
+	//             //     .modal("show");
+
+	//         }
+	//     );
+
+	// });
 </script>

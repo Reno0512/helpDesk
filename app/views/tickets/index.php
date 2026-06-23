@@ -21,6 +21,9 @@
             <th>Prioridad</th>
             <th>Estatus</th>
             <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico"): ?>
+                <th>Técnico</th>
+            <?php endif; ?>
+            <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico"): ?>
                 <th>Acciones</th>
             <?php endif; ?>
         </tr>
@@ -50,28 +53,34 @@
 
                 <td>
                     <?php
-                    
-                        switch ($t["nombre_estatus"]) {
 
-                            case 'En proceso':
-                                echo '<span class="badge bg-warning">En proceso</span>';
-                                break;
+                    switch ($t["nombre_estatus"]) {
 
-                            case 'Cerrado':
-                                echo '<span class="badge bg-danger">Cerrado</span>';
-                                break;
+                        case 'En proceso':
+                            echo '<span class="badge bg-warning">En proceso</span>';
+                            break;
 
-                            case 'Pendiente':
-                                echo '<span class="badge bg-info">Pendiente</span>';
-                                break;
+                        case 'Cerrado':
+                            echo '<span class="badge bg-danger">Cerrado</span>';
+                            break;
 
-                            default:
-                                echo '<span class="badge bg-secondary">Nuevo</span>';
-                        }
-                        ?>
+                        case 'Pendiente':
+                            echo '<span class="badge bg-info">Pendiente</span>';
+                            break;
+
+                        default:
+                            echo '<span class="badge bg-secondary">Nuevo</span>';
+                    }
+                    ?>
                     <!-- <?php echo $t['nombre_estatus']; ?> -->
 
                 </td>
+
+                <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico"): ?>
+                    <td>
+                        <?php echo $t['tecnico']; ?>
+                    </td>
+                <?php endif; ?>
 
                 <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico") : ?>
                     <td class="text-center">
@@ -136,7 +145,7 @@
                         <label>Reportante</label>
                         <input
                             name="reportante"
-                            class="form-control"
+                            class="form-control primera-mayuscula"
                             placeholder="Nombre de quien reporta">
                     </div>
 
@@ -144,12 +153,11 @@
                         <label>Titulo</label>
                         <input
                             name="titulo"
-                            class="form-control"
+                            class="form-control primera-mayuscula"
                             placeholder="Titulo o asunto principal del problema">
                     </div>
 
                     <div class="mb-3">
-
                         <label>Área General:</label>
                         <select id="area" class="form-control" name="area" onchange="cargarSubareas(this.value)" required>
                             <option value="" selected disabled>Selecciona una Dirección General</option>
@@ -164,8 +172,67 @@
 
                     <div class="mb-3">
                         <label>Descripción</label>
-                        <textarea name="descripcion" class="form-control" placeholder="Describe tu problema con detalle anexando folio(s) de equipo(s)"></textarea>
+                        <textarea name="descripcion" class="form-control primera-mayuscula" placeholder="Describe tu problema con detalle anexando folio(s) de equipo(s)"></textarea>
                     </div>
+
+                    <div class="mb-3">
+
+                        <label>Evidencia fotográfica</label>
+
+                        <div class="d-flex gap-2 mb-2">
+
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                onclick="document.getElementById('camaraInput').click()">
+                                📷 Tomar Foto
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-success"
+                                onclick="document.getElementById('galeriaInput').click()">
+                                🖼️ Elegir de Galería
+                            </button>
+
+                        </div>
+
+                        <!-- Cámara -->
+                        <input
+                            type="file"
+                            id="camaraInput"
+                            accept="image/*"
+                            capture="environment"
+                            style="display:none;">
+
+                        <!-- Galería -->
+                        <input
+                            type="file"
+                            id="galeriaInput"
+                            accept="image/*"
+                            style="display:none;">
+
+                        <!-- Este es el que realmente se enviará -->
+                        <input
+                            type="file"
+                            id="evidencia"
+                            name="evidencia"
+                            style="display:none;">
+
+                        <small class="text-muted">
+                            Puedes tomar una foto o seleccionar una imagen existente.
+                        </small>
+
+                        <div class="mt-2 text-center">
+                            <img
+                                id="previewImagen"
+                                src=""
+                                class="img-fluid rounded border d-none"
+                                style="max-height:250px;">
+                        </div>
+
+                    </div>
+
 
                     <input type="hidden" id="usuario_id" name="usuario_id" value=<?= $_SESSION["id"] ?>>
                     <input type="hidden" id="rol" name="rol" value=<?= $_SESSION["rol"] ?>>
@@ -202,7 +269,8 @@
 <script>
     $('#tabla').DataTable({
         "scrollX": true,
-        
+        "order": [],
+
         language: {
             url: 'assets/datatables/es-ES.json',
         },
@@ -210,44 +278,121 @@
 
     $("#guardar").click(function() {
 
+        let formData = new FormData(
+            document.getElementById("ticketForm")
+        );
+
         $.ajax({
 
             url: "api/tickets.php",
             type: "POST",
-            data: $("#ticketForm").serialize(),
+            data: formData,
+            processData: false,
+            contentType: false,
+
+            beforeSend: function() {
+
+                Swal.fire({
+                    title: 'Creando ticket...',
+                    text: 'Espere un momento',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+            },
 
             success: function(folio) {
 
-                // Swal.fire(
-                //     'Correcto',
-                //     'Ticket registrado',
-                //     'success'
-                // );
-
                 Swal.fire({
                     title: 'Ticket registrado',
-                    text: 'Se generó correctamente',
                     text: 'Folio ' + folio,
                     icon: 'success',
                     confirmButtonText: 'OK',
                     allowOutsideClick: false,
                     allowEscapeKey: false
-
                 }).then((result) => {
 
                     if (result.isConfirmed) {
 
                         $("#ticketForm")[0].reset();
-                        $("#modalTicket").modal('hide');
+
+                        const modal =
+                            bootstrap.Modal.getInstance(
+                                document.getElementById(
+                                    'modalTicket'
+                                )
+                            );
+
+                        modal.hide();
 
                         location.reload();
                     }
 
                 });
 
+            },
+
+            error: function(xhr) {
+
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No fue posible crear el ticket',
+                    icon: 'error'
+                });
+
+                console.log(xhr.responseText);
+
             }
 
         });
 
+    });
+
+    function procesarImagen(input) {
+
+        if (!input.files || !input.files[0]) {
+            return;
+        }
+
+        const archivo = input.files[0];
+
+        // Mostrar preview
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            $("#previewImagen")
+                .attr("src", e.target.result)
+                .removeClass("d-none");
+
+        };
+
+        reader.readAsDataURL(archivo);
+
+        // Copiar archivo al input que se envía
+        const dt = new DataTransfer();
+        dt.items.add(archivo);
+
+        document.getElementById("evidencia").files = dt.files;
+    }
+
+    $("#camaraInput").on("change", function() {
+        procesarImagen(this);
+    });
+
+    $("#galeriaInput").on("change", function() {
+        procesarImagen(this);
+    });
+
+    $('.primera-mayuscula').on('input', function() {
+        let texto = $(this).val();
+        if (texto.length > 0) {
+            // Convierte solo el primer carácter a mayúscula
+            $(this).val(texto.charAt(0).toUpperCase() + texto.slice(1));
+        }
     });
 </script>

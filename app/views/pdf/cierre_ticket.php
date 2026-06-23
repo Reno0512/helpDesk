@@ -51,8 +51,8 @@
             text-align: center;
             font-size: 20px;
             font-weight: bold;
-            margin-top: 40px;
-            margin-bottom: 40px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         .datos-ticket {
@@ -119,16 +119,28 @@
 
         <div class="datos-ticket"><b>Folio:</b> <?= htmlspecialchars($ticket["folio"]) ?></div>
         <div class="datos-ticket"><b>Area:</b> <?= htmlspecialchars($ticket["area"]) ?></div>
+        <div class="datos-ticket"><b>Reportante:</b> <?= htmlspecialchars($ticket["reportante"]) ?></div>
         <div class="datos-ticket"><b>Título:</b> <?= htmlspecialchars($ticket["titulo"]) ?></div>
         <div class="datos-ticket"><b>Descripción:</b> <?= htmlspecialchars($ticket["descripcion"]) ?></div>
         <div class="datos-ticket"><b>Estatus:</b> <?= htmlspecialchars($ticket["estatus"]) ?></div>
         <div class="datos-ticket"><b>Fecha cierre:</b> <?= htmlspecialchars($ticket["fecha_cierre"]) ?></div>
 
-        <br>
+
         <div class="datos-ticket">
             <b>Solución aplicada:</b><br>
             <?= nl2br(htmlspecialchars($ticket["solucion"])) ?>
         </div>
+
+        <h4>Evidencia:</h4>
+
+        <div style="width: 50%; float:left;">
+            <img src="<?php echo 'uploads/tickets/' . $ticket["evidencia"]; ?>" style="height:180px;border:1px solid #ccc;">
+        </div>
+
+        <div style="width: 50%; float:left;">
+            <img src="<?php echo $ultimoSeguimiento["imagen"]; ?>" style="height:180px;border:1px solid #ccc;">
+        </div>
+
 
         <table class="tabla-firmas">
             <tr>
