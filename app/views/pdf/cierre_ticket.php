@@ -135,13 +135,13 @@
 
         <?php if (!empty($ticket["evidencia"])) : ?>
             <div style="width: 50%; float:left;">
-                <img src="<?php echo 'uploads/tickets/' . $ticket["evidencia"]; ?>" style="height:180px;border:1px solid #ccc;">
+                <img src="<?php echo 'uploads/tickets/' . $ticket["evidencia"]; ?>" style="height:120px;border:1px solid #ccc;">
             </div>
         <?php endif; ?>
 
         <?php if (!empty($ultimoSeguimiento["imagen"])) : ?>
             <div style="width: 50%; float:left;">
-                <img src="<?php echo $ultimoSeguimiento["imagen"]; ?>" style="height:180px;border:1px solid #ccc;">
+                <img src="<?php echo $ultimoSeguimiento["imagen"]; ?>" style="height:120px;border:1px solid #ccc;">
             </div>
         <?php endif; ?>
 

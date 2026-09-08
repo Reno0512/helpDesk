@@ -679,50 +679,259 @@
 		}
 
 
+		/*
+		Validar evidencia fotográfica
+		*/
+
+		const inputImagen =
+			document.getElementById("imagen");
+
+
+		if (
+			!inputImagen.files ||
+			inputImagen.files.length === 0
+		) {
+
+			alert(
+				"Debe seleccionar una evidencia fotográfica."
+			);
+
+			return;
+
+		}
+
+
+		/*
+		Crear FormData
+		*/
+
+		let formData =
+			new FormData();
+
+
+		/*
+		Datos del ticket
+		*/
+
+		formData.append(
+			"ticket_id",
+			$("#ticket_id").val()
+		);
+
+
+		formData.append(
+			"comentario",
+			$("#comentario").val()
+		);
+
+
+		formData.append(
+			"solucion",
+			$("#solucion").val()
+		);
+
+
+		formData.append(
+			"observaciones",
+			$("#observaciones").val()
+		);
+
+
+		/*
+		Firma digital
+		*/
+
+		formData.append(
+			"firma",
+			firma.toDataURL()
+		);
+
+
+		/*
+		Evidencia fotográfica
+		*/
+
+		formData.append(
+			"imagen",
+			inputImagen.files[0]
+		);
+
+
+		/*
+		Deshabilitar botón
+		*/
+
+		let boton =
+			$(this);
+
+
+		boton
+			.prop("disabled", true)
+			.text("Guardando...");
+
+
+		/*
+		AJAX
+		*/
+
 		$.ajax({
 
 			url: '/guardar_firma',
 
 			method: 'POST',
 
-			data: {
+			data: formData,
 
-				ticket_id: $("#ticket_id").val(),
+			processData: false,
 
-				comentario: $("#comentario").val(),
-				solucion: $("#solucion").val(),
-				observaciones: $("#observaciones").val(),
-
-				firma: firma.toDataURL()
-
-			},
+			contentType: false,
 
 
 			success: function(response) {
 
-				// window.location.href =
-				//     "/pdf_ticket/" +
-				//     $("#ticket_id").val();
+				console.log(response);
 
-				// window.open(
-				//     "/pdf_ticket/" + $("#ticket_id").val(),
-				//     "_blank"
-				// );
 
-				// location.reload();
+				// try {
 
-				// // let ticket = $("#ticket_id").val();
+				// 	let data =
+				// 		typeof response === "string" ?
+				// 		JSON.parse(response) :
+				// 		response;
 
-				// // Abrir PDF
-				// // window.open("/pdf_ticket/" + ticket, "_blank");
 
-				// Recargar ticket actual
-				location.reload();
+				// 	if (data.ok) {
+
+				// 		alert(
+				// 			"Ticket cerrado correctamente."
+				// 		);
+
+
+						/*
+						Abrir PDF en nueva pestaña
+						*/
+
+						// window.open(
+						// 	"/pdf_ticket/" +
+						// 	$("#ticket_id").val(),
+						// 	"_blank"
+						// );
+
+
+						/*
+						Recargar página
+						*/
+
+						location.reload();
+
+			// 		} else {
+
+			// 			alert(
+			// 				data.mensaje ||
+			// 				"No fue posible cerrar el ticket."
+			// 			);
+
+			// 			boton
+			// 				.prop("disabled", false)
+			// 				.text("Firmar y Cerrar Ticket");
+
+			// 		}
+
+			// 	} catch (error) {
+
+			// 		console.error(response);
+
+			// 		alert(
+			// 			"Ocurrió un error al procesar la respuesta."
+			// 		);
+
+			// 		boton
+			// 			.prop("disabled", false)
+			// 			.text("Firmar y Cerrar Ticket");
+
+			// 	}
+
+			// },
+
+
+			// error: function(xhr) {
+
+			// 	console.error(
+			// 		xhr.responseText
+			// 	);
+
+
+			// 	alert(
+			// 		"Error al guardar el ticket."
+			// 	);
+
+
+			// 	boton
+			// 		.prop("disabled", false)
+			// 		.text("Firmar y Cerrar Ticket");
 
 			}
 
 		});
+
 	});
+
+	// $("#guardarFirma").click(function() {
+
+	// 	if (firma.isEmpty()) {
+
+	// 		alert(
+	// 			"Debe capturar la firma."
+	// 		);
+
+	// 		return;
+	// 	}
+
+
+	// 	$.ajax({
+
+	// 		url: '/guardar_firma',
+
+	// 		method: 'POST',
+
+	// 		data: {
+
+	// 			ticket_id: $("#ticket_id").val(),
+
+	// 			comentario: $("#comentario").val(),
+	// 			solucion: $("#solucion").val(),
+	// 			observaciones: $("#observaciones").val(),
+
+	// 			firma: firma.toDataURL()
+
+	// 		},
+
+
+	// 		success: function(response) {
+
+	// 			// window.location.href =
+	// 			//     "/pdf_ticket/" +
+	// 			//     $("#ticket_id").val();
+
+	// 			// window.open(
+	// 			//     "/pdf_ticket/" + $("#ticket_id").val(),
+	// 			//     "_blank"
+	// 			// );
+
+	// 			// location.reload();
+
+	// 			// // let ticket = $("#ticket_id").val();
+
+	// 			// // Abrir PDF
+	// 			// // window.open("/pdf_ticket/" + ticket, "_blank");
+
+	// 			// Recargar ticket actual
+	// 			location.reload();
+
+	// 		}
+
+	// 	});
+	// });
 
 
 
