@@ -10,7 +10,7 @@
     <!-- <meta http-equiv="refresh" content="30;url=https://sti.taxco.gob.mx/"> -->
 
     <meta property="og:title" content="STI">
-    <meta property="og:description" content="Sistema de soporte técnico de informática del H.Ayuntamiento Taxcoooo">
+    <meta property="og:description" content="Sistema de soporte técnico de informática del H.Ayuntamiento Taxco">
     <!-- <meta property="og:image" content=""> -->
     <meta property="og:image" content="./assets/img/LogoSTI.png">
     <meta property="og:image:width" content="1200">

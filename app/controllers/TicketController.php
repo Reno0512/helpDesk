@@ -4,151 +4,183 @@ require './config/database.php';
 
 function indexTickets()
 {
-    global $conn;
+	require_once './core/Auth.php';
 
-    $sql = "";
+	global $conn;
 
-    switch ($_SESSION["rol"]) {
-        case 'admin':
-            $sql = "SELECT t.id, t.folio, t.titulo, c.nombre AS nombre_area, prioridad, e.nombre as nombre_estatus, u.nombre AS tecnico
-                    FROM tickets t INNER JOIN cat_areas c ON t.area_id = c.id_area 
-                    INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus 
-                    LEFT JOIN usuarios u ON t.tecnico_id = u.id
-                    order BY t.id desc;";
-            break;
-        case 'tecnico':
-            $sql = "SELECT t.*, e.nombre as nombre_estatus, c.nombre AS nombre_area, u.nombre AS tecnico 
-            FROM tickets t 
-            INNER JOIN cat_areas c ON t.area_id = c.id_area 
-            INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
-            LEFT JOIN usuarios u ON t.tecnico_id = u.id
-            where (tecnico_id = '{$_SESSION['id']}' OR tecnico_id = '' OR tecnico_id IS NULL) order by id desc;";
-            break;
-        case 'usuario':
-            $sql = "SELECT t.*,  e.nombre as nombre_estatus, c.nombre AS nombre_area FROM tickets t INNER JOIN cat_areas c ON t.area_id = c.id_area INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus where area = '{$_SESSION['usuario']}' order by id desc;";
-            break;
-    }
+	$sql = "";
+
+	switch ($_SESSION["rol"]) {
+		case 'admin':
+			$sql = "SELECT t.id, t.folio, t.titulo, c.nombre AS nombre_area, prioridad, e.nombre as nombre_estatus, u.nombre AS tecnico
+					FROM tickets t INNER JOIN cat_areas c ON t.area_id = c.id_area
+					INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
+					LEFT JOIN usuarios u ON t.tecnico_id = u.id
+					order BY t.id desc;";
+			break;
+		case 'tecnico':
+			$sql = "SELECT t.*, e.nombre as nombre_estatus, c.nombre AS nombre_area, u.nombre AS tecnico
+			FROM tickets t
+			INNER JOIN cat_areas c ON t.area_id = c.id_area
+			INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
+			LEFT JOIN usuarios u ON t.tecnico_id = u.id
+			-- where (tecnico_id = '{$_SESSION['id']}' OR tecnico_id = '' OR tecnico_id IS NULL) 
+			order by id desc;";
+			break;
+		case 'usuario':
+			$sql = "SELECT t.*,  e.nombre as nombre_estatus, c.nombre AS nombre_area FROM tickets t INNER JOIN cat_areas c ON t.area_id = c.id_area INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus where area = '{$_SESSION['usuario']}' order by id desc;";
+			break;
+		case 'asistente':
+			$sql = "SELECT t.id, t.folio, t.titulo, c.nombre AS nombre_area, prioridad, e.nombre as nombre_estatus, u.nombre AS tecnico
+					FROM tickets t INNER JOIN cat_areas c ON t.area_id = c.id_area
+					INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
+					LEFT JOIN usuarios u ON t.tecnico_id = u.id
+					order BY t.id desc;";
+			break;
+	}
 
 
 
-    if ($sql != null || $sql != '') {
-        $tickets = $conn->query($sql);
-    }
+	if ($sql != null || $sql != '') {
+		$tickets = $conn->query($sql);
+	}
 
-    $sql = "SELECT * FROM cat_areas";
+	$sql = "SELECT * FROM cat_areas";
 
-    $areas_principales = $conn->query($sql);
+	$areas_principales = $conn->query($sql);
 
 
-    require './app/views/tickets/index.php';
+	require './app/views/tickets/index.php';
 }
 
 function verTicket()
 {
-    global $conn;
+	require_once './core/Auth.php';
 
-    $id = $_GET["id"];
+	global $conn;
 
-    // $sql = "
-    // SELECT *    
-    // FROM tickets
-    // WHERE id = $id
-    // ";
+	$id = $_GET["id"];
 
-    $sql = "SELECT t.*, e.nombre as nombre_estatus, c.nombre AS nombre_area FROM tickets t INNER JOIN cat_areas c ON t.area_id = c.id_area INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus WHERE id = $id;";
+	// $sql = "
+	// SELECT *
+	// FROM tickets
+	// WHERE id = $id
+	// ";
 
-    $ticket = $conn
-        ->query($sql)
-        ->fetch_assoc();
+	$sql = "SELECT t.*, e.nombre as nombre_estatus, c.nombre AS nombre_area 
+			FROM tickets t 
+			INNER JOIN cat_areas c ON t.area_id = c.id_area 
+			INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus WHERE id = $id;";
 
-    $sql = "SELECT * from cat_estatus";
+	$ticket = $conn
+		->query($sql)
+		->fetch_assoc();
 
-    $estatus_cat = $conn
-        ->query($sql);
+	$sql = "SELECT * from cat_estatus";
 
-    $historial = $conn->query("
-        SELECT t.*, e.nombre as nombre_estatus
-        FROM ticket_historial t
-        INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
-        WHERE ticket_id=$id
-        ORDER BY fecha DESC
-    ");
+	$estatus_cat = $conn
+		->query($sql);
+
+	$sql = "SELECT 
+                id,
+                nombre
+            FROM usuarios
+            WHERE rol = 'tecnico'
+            ORDER BY nombre ASC";
+
+	$tecnicos = $conn
+		->query($sql);
+
+	$historial = $conn->query("
+		SELECT t.*, e.nombre as nombre_estatus
+		FROM ticket_historial t
+		INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
+		WHERE ticket_id=$id
+		ORDER BY fecha DESC
+	");
 
 
-    require './app/views/tickets/ver.php';
+	require './app/views/tickets/ver.php';
 }
+
 
 function guardarSeguimiento()
 {
 
-    global $conn;
+	require_once './core/Auth.php';
 
-    $ticket_id = $_POST["ticket_id"];
-    $estatus = $_POST["estatus"];
-    $prioridad = $_POST["prioridad"];
+	global $conn;
 
-    $comentario = trim($_POST["comentario"]);
+	$ticket_id = $_POST["ticket_id"];
+	$estatus = $_POST["estatus"];
+	$prioridad = $_POST["prioridad"];
+	$tecnico_id = $_POST['tecnico_id'];
 
-    /*
-    Actualiza estatus actual del ticket
-    */
+	$comentario = trim($_POST["comentario"]);
 
-    $actualizar = $conn->query("
-        UPDATE tickets
-        SET estatus_id='$estatus', prioridad='$prioridad'
-        WHERE id=$ticket_id
-    ");
+	/*
+	Actualiza estatus actual del ticket
+	*/
 
-    /*
-    Guarda movimiento en historial
-    */
+	$actualizar = $conn->query("
+		UPDATE tickets
+		SET 
+		estatus_id='$estatus', 
+		prioridad='$prioridad',
+		tecnico_id='$tecnico_id'
+		WHERE id=$ticket_id
+	");
 
-    $rutaImagen = null;
+	/*
+		Agregar funcionalidad de guardar imagen en los botones de firma
+	*/
 
-    if (isset($_FILES["imagen"]) && $_FILES["imagen"]["error"] == 0) {
-        $extension = strtolower(pathinfo($_FILES["imagen"]["name"], PATHINFO_EXTENSION));
+	$rutaImagen = null;
 
-        $nombreArchivo = uniqid() . "." . $extension;
+	if (isset($_FILES["imagen"]) && $_FILES["imagen"]["error"] == 0) {
+		$extension = strtolower(pathinfo($_FILES["imagen"]["name"], PATHINFO_EXTENSION));
 
-        $rutaDestino = "./uploads/seguimientos/" . $nombreArchivo;
+		$nombreArchivo = uniqid() . "." . $extension;
 
-        move_uploaded_file($_FILES["imagen"]["tmp_name"], $rutaDestino);
+		$rutaDestino = "./uploads/seguimientos/" . $nombreArchivo;
 
-        $rutaImagen = "/uploads/seguimientos/" . $nombreArchivo;
-    }
+		move_uploaded_file($_FILES["imagen"]["tmp_name"], $rutaDestino);
 
-    $historial = $conn->query("
-        INSERT INTO ticket_historial(
-            ticket_id,
-            estatus_id,
-            comentario,
-            imagen,
-            usuario
-        )
-        VALUES(
-            $ticket_id,
-            '$estatus',
-            '$comentario',
-            " . ($rutaImagen ? "'$rutaImagen'" : "NULL") . ",
-            '{$_SESSION['usuario']}'
-        )
-    ");
+		$rutaImagen = "/uploads/seguimientos/" . $nombreArchivo;
+	}
 
-    if ($actualizar && $historial) {
+	$historial = $conn->query("
+		INSERT INTO ticket_historial(
+			ticket_id,
+			estatus_id,
+			comentario,
+			imagen,
+			usuario
+		)
+		VALUES(
+			$ticket_id,
+			'$estatus',
+			'$comentario',
+			" . ($rutaImagen ? "'$rutaImagen'" : "NULL") . ",
+			'{$_SESSION['usuario']}'
+		)
+	");
 
-        $_SESSION['mensaje'] = "Seguimiento guardado correctamente.";
-        $_SESSION['tipo_mensaje'] = "success";
-    } else {
+	if ($actualizar && $historial) {
 
-        $_SESSION['mensaje'] = "Error al guardar seguimiento: " . $conn->error;
-        $_SESSION['tipo_mensaje'] = "danger";
-    }
+		$_SESSION['mensaje'] = "Seguimiento guardado correctamente.";
+		$_SESSION['tipo_mensaje'] = "success";
+	} else {
 
-    header(
-        "Location:/ver_ticket/$ticket_id"
-    );
+		$_SESSION['mensaje'] = "Error al guardar seguimiento: " . $conn->error;
+		$_SESSION['tipo_mensaje'] = "danger";
+	}
 
-    exit;
+	header(
+		"Location:/ver_ticket/$ticket_id"
+	);
+
+	exit;
 }
 
 // function cerrarTicket()
@@ -224,161 +256,178 @@ function guardarSeguimiento()
 function guardarImagenFirma($firmaBase64, $ticket_id)
 {
 
-    // Quitar encabezado del Base64
-    $firmaBase64 = str_replace(
-        'data:image/png;base64,',
-        '',
-        $firmaBase64
-    );
+	// Quitar encabezado del Base64
+	$firmaBase64 = str_replace(
+		'data:image/png;base64,',
+		'',
+		$firmaBase64
+	);
 
-    $firmaBase64 = str_replace(
-        ' ',
-        '+',
-        $firmaBase64
-    );
+	$firmaBase64 = str_replace(
+		' ',
+		'+',
+		$firmaBase64
+	);
 
-    // Decodificar imagen
-    $imagen = base64_decode(
-        $firmaBase64
-    );
+	// Decodificar imagen
+	$imagen = base64_decode(
+		$firmaBase64
+	);
 
-    // Crear carpeta si no existe
-    $directorio =
-        './uploads/firmas/';
+	// Crear carpeta si no existe
+	$directorio =
+		'./uploads/firmas/';
 
-    if (!is_dir($directorio)) {
+	if (!is_dir($directorio)) {
 
-        mkdir(
-            $directorio,
-            0777,
-            true
-        );
-    }
+		mkdir(
+			$directorio,
+			0777,
+			true
+		);
+	}
 
-    // Nombre único
-    $nombreArchivo =
-        'solicitante_' .
-        $ticket_id .
-        '_' .
-        date('YmdHis') .
-        '.png';
+	// Nombre único
+	$nombreArchivo =
+		'solicitante_' .
+		$ticket_id .
+		'_' .
+		date('YmdHis') .
+		'.png';
 
-    $rutaCompleta =
-        $directorio .
-        $nombreArchivo;
+	$rutaCompleta =
+		$directorio .
+		$nombreArchivo;
 
-    // Guardar archivo
-    file_put_contents(
-        $rutaCompleta,
-        $imagen
-    );
+	// Guardar archivo
+	file_put_contents(
+		$rutaCompleta,
+		$imagen
+	);
 
-    // Ruta que se guardará en BD
-    return
-        'uploads/firmas/' .
-        $nombreArchivo;
+	// Ruta que se guardará en BD
+	return
+		'uploads/firmas/' .
+		$nombreArchivo;
 }
 
 function guardarFirmaSolicitante()
 {
-    global $conn;
+	require_once './core/Auth.php';
 
-    $ticket_id = $_POST["ticket_id"];
+	global $conn;
 
-    $comentario = $_POST["comentario"];
+	$ticket_id = $_POST["ticket_id"];
 
-    $solucion = $_POST["solucion"];
+	$comentario = $_POST["comentario"];
 
-    $observaciones = $_POST["observaciones"];
+	$solucion = $_POST["solucion"];
 
-    $ticket_id =
-        $_POST["ticket_id"];
+	$observaciones = $_POST["observaciones"];
 
-    $firma =
-        $_POST["firma"];
+	$ticket_id =
+		$_POST["ticket_id"];
 
-    $firma =
-        str_replace(
-            'data:image/png;base64,',
-            '',
-            $firma
-        );
+	$firma =
+		$_POST["firma"];
 
-    $firma =
-        str_replace(
-            ' ',
-            '+',
-            $firma
-        );
+	$firma =
+		str_replace(
+			'data:image/png;base64,',
+			'',
+			$firma
+		);
 
-    $data =
-        base64_decode($firma);
+	$firma =
+		str_replace(
+			' ',
+			'+',
+			$firma
+		);
 
-    $archivo =
-        './uploads/firmas/' .
-        'solicitante_' .
-        $ticket_id .
-        '.png';
+	$data =
+		base64_decode($firma);
 
-    file_put_contents(
-        $archivo,
-        $data
-    );
+	$archivo =
+		'./uploads/firmas/' .
+		'solicitante_' .
+		$ticket_id .
+		'.png';
 
-    $conn->query("
-        INSERT INTO ticket_firmas(
-            ticket_id,
-            firma_solicitante
-        )
-        VALUES(
-            $ticket_id,
-            '$archivo'
-        )
-    ");
+	file_put_contents(
+		$archivo,
+		$data
+	);
 
-    $conn->query("
-        UPDATE tickets
-        SET
-            estatus_id='4',
-            fecha_cierre=NOW()
-        WHERE id=$ticket_id
-    ");
+	$conn->query("
+		INSERT INTO ticket_firmas(
+			ticket_id,
+			firma_solicitante
+		)
+		VALUES(
+			$ticket_id,
+			'$archivo'
+		)
+	");
+
+	$conn->query("
+		UPDATE tickets
+		SET
+			estatus_id='4',
+			fecha_cierre=NOW()
+		WHERE id=$ticket_id
+	");
+
+	$rutaImagen = null;
+
+	if (isset($_FILES["imagen"]) && $_FILES["imagen"]["error"] == 0) {
+		$extension = strtolower(pathinfo($_FILES["imagen"]["name"], PATHINFO_EXTENSION));
+
+		$nombreArchivo = uniqid() . "." . $extension;
+
+		$rutaDestino = "./uploads/seguimientos/" . $nombreArchivo;
+
+		move_uploaded_file($_FILES["imagen"]["tmp_name"], $rutaDestino);
+
+		$rutaImagen = "/uploads/seguimientos/" . $nombreArchivo;
+	}
 
 
+	$conn->query("
+	INSERT INTO ticket_historial(
+		ticket_id,
+		comentario,
+		estatus_id,
+		usuario,
+		imagen
+	)
+	VALUES(
+		$ticket_id,
+		'$comentario',
+		'4',
+		'{$_SESSION['usuario']}',
+		" . ($rutaImagen ? "'$rutaImagen'" : "NULL") . "
+	)
+	");
 
-    $conn->query("
-    INSERT INTO ticket_historial(
-        ticket_id,
-        comentario,
-        estatus_id,
-        usuario
-    )
-    VALUES(
-        $ticket_id,
-        '$comentario',
-        '4',
-        '{$_SESSION['usuario']}'
-    )
-    ");
+	$conn->query("
+	INSERT INTO ticket_cierre(
+		ticket_id,
+		solucion,
+		observaciones
+	)
+	VALUES(
+		$ticket_id,
+		'$solucion',
+		'$observaciones'
+	)
+	");
 
-    $conn->query("
-    INSERT INTO ticket_cierre(
-        ticket_id,
-        solucion,
-        observaciones
-    )
-    VALUES(
-        $ticket_id,
-        '$solucion',
-        '$observaciones'
-    )
-    ");
+	echo json_encode([
+		'ok' => true
+	]);
 
-    echo json_encode([
-        'ok' => true
-    ]);
-
-    exit;
+	exit;
 }
 
 // function solicitarFirma()
@@ -410,67 +459,68 @@ function guardarFirmaSolicitante()
 
 function firmaTicket()
 {
-    global $conn;
 
-    $token =
-        $_GET["token"];
+	global $conn;
 
-    $ticket =
-        $conn->query("
-        SELECT t.id, t.folio, t.titulo, t.descripcion, tc.solucion, tc.observaciones
-        FROM tickets t
-        INNER JOIN ticket_cierre tc ON t.id=tc.ticket_id
-        WHERE token_firma='$token'
-    ")->fetch_assoc();
+	$token =
+		$_GET["token"];
 
-    if (!$ticket) {
+	$ticket =
+		$conn->query("
+		SELECT t.id, t.folio, t.titulo, t.descripcion, tc.solucion, tc.observaciones
+		FROM tickets t
+		INNER JOIN ticket_cierre tc ON t.id=tc.ticket_id
+		WHERE token_firma='$token'
+	")->fetch_assoc();
 
-        die("Enlace inválido");
-    }
+	if (!$ticket) {
 
-    require
-        './app/views/tickets/firma.php';
+		die("Enlace inválido");
+	}
+
+	require
+		'./app/views/tickets/firma.php';
 }
 
 
 function guardarFirmaRemoto()
 {
-    global $conn;
+	global $conn;
 
-    $ticket_id =
-        $_POST["ticket_id"];
+	$ticket_id =
+		$_POST["ticket_id"];
 
-    $firma =
-        $_POST["firma"];
+	$firma =
+		$_POST["firma"];
 
-    $archivo =
-        guardarImagenFirma(
-            $firma,
-            $ticket_id
-        );
+	$archivo =
+		guardarImagenFirma(
+			$firma,
+			$ticket_id
+		);
 
-    $conn->query("
-        INSERT INTO ticket_firmas(
-            ticket_id,
-            firma_solicitante
-        )
-        VALUES(
-            $ticket_id,
-            '$archivo'
-        )
-    ");
+	$conn->query("
+		INSERT INTO ticket_firmas(
+			ticket_id,
+			firma_solicitante
+		)
+		VALUES(
+			$ticket_id,
+			'$archivo'
+		)
+	");
 
-    $conn->query("
-        UPDATE tickets
-        SET
-            estatus_id=4,
-            fecha_cierre=NOW()
-        WHERE id=$ticket_id
-    ");
+	$conn->query("
+		UPDATE tickets
+		SET
+			estatus_id=4,
+			fecha_cierre=NOW()
+		WHERE id=$ticket_id
+	");
 
-    echo json_encode([
-        "ok" => true
-    ]);
+	echo json_encode([
+		"ok" => true
+	]);
 }
 
 
@@ -483,95 +533,498 @@ use Dompdf\Options;
 function generarPDF()
 {
 
-    global $conn;
+	require_once './core/Auth.php';
 
-    $id = $_GET["id"];
+	global $conn;
 
-    $ticket = $conn->query("SELECT folio, a.nombre AS area, t.reportante, titulo, descripcion, e.nombre AS estatus, fecha_cierre, solucion, evidencia  
-                            FROM tickets t
-                            INNER JOIN ticket_cierre tc on t.id=tc.ticket_id 
-                            INNER JOIN cat_areas a on t.area_id=a.id_area 
-                            INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus 
-                            WHERE t.id=$id
-    ")->fetch_assoc();
+	$id = $_GET["id"];
 
-    // var_dump($ticket);
-    // exit;
+	$ticket = $conn->query("SELECT folio, a.nombre AS area, t.reportante, titulo, descripcion, e.nombre AS estatus, fecha_cierre, solucion, evidencia
+							FROM tickets t
+							INNER JOIN ticket_cierre tc on t.id=tc.ticket_id
+							INNER JOIN cat_areas a on t.area_id=a.id_area
+							INNER JOIN cat_estatus e ON t.estatus_id = e.id_estatus
+							WHERE t.id=$id
+	")->fetch_assoc();
 
-    $ultimoSeguimiento = $conn->query("
-    SELECT *
-    FROM ticket_historial
-    WHERE ticket_id = $id
-    AND imagen IS NOT NULL
-    AND imagen <> ''
-    ORDER BY id DESC
-    LIMIT 1
-    ")->fetch_assoc();
+	// var_dump($ticket);
+	// exit;
 
-    $rutaImagenCierre = '';
+	$ultimoSeguimiento = $conn->query("
+	SELECT *
+	FROM ticket_historial
+	WHERE ticket_id = $id
+	AND imagen IS NOT NULL
+	AND imagen <> ''
+	ORDER BY id DESC
+	LIMIT 1
+	")->fetch_assoc();
 
-    ob_start();
+	$rutaImagenCierre = '';
 
-    $rutaRaizProyecto = dirname(__DIR__, 2);
+	ob_start();
 
-    // Tu ruta exacta hacia la imagen
-    $rutaImagen = $rutaRaizProyecto . '/assets/img/membrete.png';
+	$rutaRaizProyecto = dirname(__DIR__, 2);
 
-    $rutaFirma = $rutaRaizProyecto . $conn->query("SELECT u.firma FROM tickets t 
-                            INNER JOIN usuarios u ON t.tecnico_id=u.id
-                                WHERE t.id=$id")->fetch_object()->firma;
+	// Tu ruta exacta hacia la imagen
+	$rutaImagen = $rutaRaizProyecto . '/assets/img/membrete.png';
 
-    // $rutaFirma = $rutaRaizProyecto . '/assets/img/firmaRodo.png';
+	$rutaFirma = $rutaRaizProyecto . $conn->query("SELECT u.firma FROM tickets t
+							INNER JOIN usuarios u ON t.tecnico_id=u.id
+								WHERE t.id=$id")->fetch_object()->firma;
 
-    $firma = $conn->query("
-    SELECT *
-    FROM ticket_firmas
-    WHERE ticket_id=$id
-    ORDER BY id DESC
-    LIMIT 1
-    ")->fetch_assoc();
+	// $rutaFirma = $rutaRaizProyecto . '/assets/img/firmaRodo.png';
 
-    include './app/views/pdf/cierre_ticket.php';
+	$firma = $conn->query("
+	SELECT *
+	FROM ticket_firmas
+	WHERE ticket_id=$id
+	ORDER BY id DESC
+	LIMIT 1
+	")->fetch_assoc();
 
-    $html = ob_get_clean();
+	include './app/views/pdf/cierre_ticket.php';
 
-    $options = new Options();
+	$html = ob_get_clean();
 
-    $options->set('isRemoteEnabled', true);
+	$options = new Options();
 
-    // AUTORIZACIÓN: Permite a Dompdf leer archivos dentro de la raíz de tu proyecto
-    $options->setChroot($rutaRaizProyecto);
+	$options->set('isRemoteEnabled', true);
 
-    $dompdf = new Dompdf($options);
+	// AUTORIZACIÓN: Permite a Dompdf leer archivos dentro de la raíz de tu proyecto
+	$options->setChroot($rutaRaizProyecto);
 
-    $dompdf->loadHtml($html);
+	$dompdf = new Dompdf($options);
 
-    $dompdf->setPaper('letter', 'portrait');
+	$dompdf->loadHtml($html);
 
-    $dompdf->render();
+	$dompdf->setPaper('letter', 'portrait');
 
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
+	$dompdf->render();
 
-    header('Content-Type: application/pdf');
-    header('Cache-Control: private, max-age=0, must-revalidate');
-    header('Pragma: public');
+	while (ob_get_level()) {
+		ob_end_clean();
+	}
 
-    // $pdf = "uploads/pdf/Ticket_" . $ticket["folio"] . ".pdf";
+	header('Content-Type: application/pdf');
+	header('Cache-Control: private, max-age=0, must-revalidate');
+	header('Pragma: public');
 
-    // $conn->query("
-    // UPDATE tickets
-    // SET pdf_cierre='$pdf'
-    // WHERE id=$id
-    // ");
+	// $pdf = "uploads/pdf/Ticket_" . $ticket["folio"] . ".pdf";
 
-    $dompdf->stream(
-        "Ticket_" . $ticket["folio"] . ".pdf",
-        ["Attachment" => false]
-    );
+	// $conn->query("
+	// UPDATE tickets
+	// SET pdf_cierre='$pdf'
+	// WHERE id=$id
+	// ");
 
-    exit;
+	$dompdf->stream(
+		"Ticket_" . $ticket["folio"] . ".pdf",
+		["Attachment" => false]
+	);
+
+	exit;
+}
+
+function nuevoTicketPublico()
+{
+	global $conn;
+
+	$sql = "SELECT *
+            FROM cat_areas
+            ORDER BY nombre ASC";
+
+	$areas = $conn->query($sql);
+
+	require './app/views/tickets/nuevo.php';
+}
+
+function guardarTicketPublico()
+{
+	global $conn;
+
+	$reportante  = trim($_POST['reportante'] ?? '');
+	$telefono    = trim($_POST['telefono'] ?? '');
+	$area_id     = (int)($_POST['area_id'] ?? 0);
+	$titulo      = trim($_POST['titulo'] ?? '');
+	$descripcion = trim($_POST['descripcion'] ?? '');
+
+
+	// ==========================================
+	// VALIDAR DATOS
+	// ==========================================
+
+	if (
+		$reportante === '' ||
+		$telefono === '' ||
+		$area_id <= 0 ||
+		$titulo === '' ||
+		$descripcion === ''
+	) {
+		die('Todos los campos obligatorios deben ser completados.');
+	}
+
+
+	// ==========================================
+	// OBTENER ESTATUS "Nuevo"
+	// ==========================================
+
+	$sqlEstatus = "
+        SELECT id_estatus
+        FROM cat_estatus
+        WHERE nombre = 'Nuevo'
+        LIMIT 1
+    ";
+
+	$resultadoEstatus = $conn->query($sqlEstatus);
+
+	if (
+		!$resultadoEstatus ||
+		$resultadoEstatus->num_rows === 0
+	) {
+		die('No se encontró el estatus Nuevo.');
+	}
+
+	$estatus = $resultadoEstatus->fetch_assoc();
+
+	$estatus_id = (int)$estatus['id_estatus'];
+
+
+	// ==========================================
+	// INSERTAR TICKET
+	// ==========================================
+
+	$stmt = $conn->prepare("
+        INSERT INTO tickets (
+            titulo,
+            reportante,
+            telefono,
+            area_id,
+            descripcion,
+            prioridad,
+            estatus_id,
+            usuario_id,
+            tecnico_id
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            'Media',
+            ?,
+            NULL,
+            NULL
+        )
+    ");
+
+	$stmt->bind_param(
+		"sssisi",
+		$titulo,
+		$reportante,
+		$telefono,
+		$area_id,
+		$descripcion,
+		$estatus_id
+	);
+
+
+	if (!$stmt->execute()) {
+
+		die('No fue posible registrar el ticket: ' .
+			$stmt->error);
+	}
+
+
+	// ==========================================
+	// ID GENERADO
+	// ==========================================
+
+	$ticket_id = $stmt->insert_id;
+
+
+	// ==========================================
+	// GENERAR FOLIO
+	// ==========================================
+
+	$next = $ticket_id;
+
+	$folio =
+		'TCK-' . date('Y') . '-' .
+		str_pad(
+			$next,
+			5,
+			'0',
+			STR_PAD_LEFT
+		);
+
+
+	// ==========================================
+	// EVIDENCIA
+	// ==========================================
+
+	$nombreEvidencia = null;
+
+	if (
+		isset($_FILES['evidencia']) &&
+		$_FILES['evidencia']['error'] === UPLOAD_ERR_OK
+	) {
+
+		$archivo = $_FILES['evidencia'];
+
+
+		// --------------------------------------
+		// VALIDAR MIME
+		// --------------------------------------
+
+		$permitidos = [
+			'image/jpeg' => 'jpg',
+			'image/png'  => 'png',
+			'image/webp' => 'webp'
+		];
+
+
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+		$mime = finfo_file(
+			$finfo,
+			$archivo['tmp_name']
+		);
+
+		finfo_close($finfo);
+
+
+		if (!isset($permitidos[$mime])) {
+
+			die('El archivo seleccionado no es una imagen válida.');
+		}
+
+
+		// --------------------------------------
+		// NOMBRE DE LA IMAGEN
+		// --------------------------------------
+
+		$extension = $permitidos[$mime];
+
+		$nombreEvidencia =
+			$folio . '.' . $extension;
+
+
+		// --------------------------------------
+		// DIRECTORIO
+		// --------------------------------------
+
+		$directorio =
+			__DIR__ .
+			'/../../uploads/tickets/';
+
+
+		if (!is_dir($directorio)) {
+
+			if (!mkdir($directorio, 0755, true)) {
+
+				die('No fue posible crear el directorio de evidencias.');
+			}
+		}
+
+
+		// --------------------------------------
+		// GUARDAR IMAGEN
+		// --------------------------------------
+
+		if (!move_uploaded_file(
+			$archivo['tmp_name'],
+			$directorio . $nombreEvidencia
+		)) {
+
+			die('No fue posible guardar la evidencia.');
+		}
+	}
+
+
+	// ==========================================
+	// ACTUALIZAR FOLIO Y EVIDENCIA
+	// ==========================================
+
+	$stmtFolio = $conn->prepare("
+        UPDATE tickets
+        SET
+            folio = ?,
+            evidencia = ?
+        WHERE id = ?
+    ");
+
+
+	$stmtFolio->bind_param(
+		"ssi",
+		$folio,
+		$nombreEvidencia,
+		$ticket_id
+	);
+
+
+	if (!$stmtFolio->execute()) {
+
+		die('El ticket fue creado pero no se pudo actualizar el folio.');
+	}
+
+
+	// ==========================================
+	// OBTENER NOMBRE DEL ÁREA
+	// ==========================================
+
+	$stmtArea = $conn->prepare("
+        SELECT nombre
+        FROM cat_areas
+        WHERE id_area = ?
+        LIMIT 1
+    ");
+
+	$stmtArea->bind_param(
+		"i",
+		$area_id
+	);
+
+	$stmtArea->execute();
+
+	$resultadoArea = $stmtArea->get_result();
+
+	$area = $resultadoArea->fetch_assoc();
+
+	$nombreArea = $area
+		? $area['nombre']
+		: 'Área no especificada';
+
+
+	// ==========================================
+	// DATOS PARA LA VISTA
+	// ==========================================
+
+	$ticket = [
+		'id' => $ticket_id,
+		'folio' => $folio,
+		'reportante' => $reportante,
+		'telefono' => $telefono,
+		'titulo' => $titulo,
+		'descripcion' => $descripcion,
+		'prioridad' => 'Media',
+		'nombre_area' => $nombreArea,
+		'fecha' => date('Y-m-d H:i:s'),
+		'evidencia' => $nombreEvidencia
+	];
+
+
+	// ==========================================
+	// MOSTRAR REGISTRADO
+	// ==========================================
+
+	require './app/views/tickets/registrado.php';
+}
+
+function consultarTicket()
+{
+	global $conn;
+
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+		$folio = trim($_POST['folio'] ?? '');
+
+		if ($folio === '') {
+
+			$error = "Debes ingresar un folio.";
+
+			require './app/views/tickets/consultar.php';
+
+			return;
+		}
+
+		// ==========================================
+		// OBTENER TICKET
+		// ==========================================
+
+		$stmt = $conn->prepare("
+            SELECT
+                t.id,
+                t.folio,
+                t.titulo,
+                t.reportante,
+                t.descripcion,
+                t.prioridad,
+                t.fecha,
+                t.fecha_cierre,
+                e.nombre AS nombre_estatus,
+                a.nombre AS nombre_area
+            FROM tickets t
+
+            INNER JOIN cat_estatus e
+                ON t.estatus_id = e.id_estatus
+
+            INNER JOIN cat_areas a
+                ON t.area_id = a.id_area
+
+            WHERE t.folio = ?
+
+            LIMIT 1
+        ");
+
+		$stmt->bind_param("s", $folio);
+
+		$stmt->execute();
+
+		$resultado = $stmt->get_result();
+
+		$ticket = $resultado->fetch_assoc();
+
+
+		// ==========================================
+		// TICKET NO ENCONTRADO
+		// ==========================================
+
+		if (!$ticket) {
+
+			$error = "No se encontró ningún ticket con el folio proporcionado.";
+
+			require './app/views/tickets/consultar.php';
+
+			return;
+		}
+
+
+		// ==========================================
+		// OBTENER HISTORIAL
+		// ==========================================
+
+		$historial = $conn->query("
+            SELECT
+                h.*,
+                e.nombre AS nombre_estatus
+            FROM ticket_historial h
+
+            INNER JOIN cat_estatus e
+                ON h.estatus_id = e.id_estatus
+
+            WHERE h.ticket_id = {$ticket['id']}
+
+            ORDER BY h.fecha ASC
+        ");
+
+
+		// ==========================================
+		// MOSTRAR RESULTADO
+		// ==========================================
+
+		require './app/views/tickets/resultado.php';
+
+		return;
+	}
+
+
+	// ==========================================
+	// MOSTRAR FORMULARIO
+	// ==========================================
+
+	require './app/views/tickets/consultar.php';
 }
 
 

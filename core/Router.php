@@ -38,7 +38,6 @@ switch (true) {
         indexTickets();
         break;
 
-
     case $uri == 'actualizar_ticket':
         require __DIR__ . '/../app/controllers/TicketController.php';
         guardarSeguimiento();
@@ -49,11 +48,7 @@ switch (true) {
     //     verTicket();
     //     break;
 
-    case preg_match(
-        '/^ver_ticket\/([0-9]+)$/',
-        $uri,
-        $matches
-    ):
+    case preg_match('/^ver_ticket\/([0-9]+)$/', $uri, $matches):
 
         $_GET["id"] = $matches[1];
 
@@ -126,12 +121,44 @@ switch (true) {
         break;
 
 
-
     case $uri == 'logout':
 
         session_destroy();
 
         header('Location:/login');
+
+        break;
+
+    case $uri == 'tickets/nuevo':
+
+        require __DIR__ . '/../app/controllers/TicketController.php';
+
+        nuevoTicketPublico();
+
+        break;
+
+
+    case $uri == 'tickets/guardar':
+
+        require __DIR__ . '/../app/controllers/TicketController.php';
+
+        guardarTicketPublico();
+
+        break;
+
+    case $uri == 'tickets/consultar':
+
+        require __DIR__ . '/../app/controllers/TicketController.php';
+
+        consultarTicket();
+
+        break;
+
+    case 'eliminar_ticket':
+
+        require __DIR__ . '/../app/controllers/TicketController.php';
+
+        eliminarTicket();
 
         break;
 

@@ -207,11 +207,49 @@
 						<div class="mb-3">
 
 							<label>
+								Asignar Técnico
+							</label>
+
+							<select
+								id="tecnico"
+								class="form-control"
+								name="tecnico_id"
+								required>
+
+								<option
+									value=""
+									disabled
+									<?php echo empty($ticket['tecnico_id']) ? 'selected' : ''; ?>>
+
+									Selecciona un Técnico
+
+								</option>
+
+								<?php foreach ($tecnicos as $tecnico): ?>
+
+									<option
+										value="<?php echo $tecnico['id']; ?>"
+										<?php echo ($tecnico['id'] == $ticket['tecnico_id']) ? 'selected' : ''; ?>>
+
+										<?php echo htmlspecialchars($tecnico['nombre']); ?>
+
+									</option>
+
+								<?php endforeach; ?>
+
+							</select>
+
+						</div>
+
+						<div class="mb-3">
+
+							<label>
 								Comentario Técnico
 							</label>
 
 							<textarea
 								name="comentario"
+								id="comentario"
 								class="form-control primera-mayuscula"
 								rows="2"></textarea>
 
@@ -226,6 +264,7 @@
 							<input
 								type="file"
 								name="imagen"
+								id="imagen"
 								class="form-control"
 								accept="image/*">
 
@@ -245,6 +284,7 @@
 
 								<textarea
 									name="solucion"
+									id="solucion"
 									class="form-control primera-mayuscula"
 									rows="2"></textarea>
 
@@ -259,6 +299,7 @@
 
 								<textarea
 									name="observaciones"
+									id="observaciones"
 									class="form-control primera-mayuscula"
 									rows="2"></textarea>
 
@@ -278,7 +319,7 @@
 						<button
 							id="btnFirmar"
 							type="button"
-							class="btn btn-danger"
+							class="btn btn-danger mb-3"
 							data-bs-toggle="modal"
 							data-bs-target="#modalFirma"
 							style="display:none;">
@@ -290,10 +331,21 @@
 						<button
 							id="btnSolicitarFirma"
 							type="button"
-							class="btn btn-success"
+							class="btn btn-success mb-3"
 							style="display:none;">
 
 							Solicitar Firma
+
+						</button>
+
+						<button
+							id="btnWhatsApp"
+							type="button"
+							class="btn btn-success mb-3"
+							onclick="enviarWhatsApp()">
+
+							<i class="fa fa-whatsapp"></i>
+							Enviar WhatsApp
 
 						</button>
 
@@ -301,7 +353,7 @@
 							<a
 								href="https://sti.taxco.gob.mx/pdf_ticket/<?php echo $ticket["id"]; ?>"
 								target="_blank"
-								class="btn btn-danger">
+								class="btn btn-danger mb-3">
 
 								Ver PDF de Cierre
 
@@ -388,8 +440,7 @@
 
 </div>
 
-<div
-	class="modal fade"
+<div class="modal fade"
 	tabindex="-1"
 	id="modalFirma">
 
@@ -627,6 +678,7 @@
 			return;
 		}
 
+
 		$.ajax({
 
 			url: '/guardar_firma',
@@ -644,6 +696,7 @@
 				firma: firma.toDataURL()
 
 			},
+
 
 			success: function(response) {
 
@@ -786,6 +839,64 @@
 			});
 	}
 
+	let ventanaWhatsApp = null;
+
+	function enviarWhatsApp() {
+
+		// Teléfono registrado en el ticket
+		let telefono = "<?php echo htmlspecialchars($ticket['telefono'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
+
+		if (!telefono) {
+
+			Swal.fire({
+				icon: 'warning',
+				title: 'Sin teléfono',
+				text: 'Este ticket no tiene un número de teléfono registrado.'
+			});
+
+			return;
+		}
+
+		// Dejamos únicamente números
+		telefono = telefono.replace(/\D/g, '');
+
+		// Si el número es de México y tiene 10 dígitos
+		if (telefono.length === 10) {
+			telefono = '52' + telefono;
+		}
+
+		// Obtener comentario escrito por el técnico
+		let comentario = document.getElementById('comentario').value.trim();
+
+		let mensaje =
+			"Hola <?php echo htmlspecialchars($ticket['reportante'] ?? '', ENT_QUOTES, 'UTF-8'); ?>,\n" +
+			"Le contactamos respecto a su reporte con folio *<?php echo htmlspecialchars($ticket['folio'] ?? '', ENT_QUOTES, 'UTF-8'); ?>* - " +
+			"*<?php echo htmlspecialchars($ticket['titulo'] ?? '', ENT_QUOTES, 'UTF-8'); ?>*.\n";
+
+		if (comentario !== '') {
+			mensaje += comentario + "\n";
+		}
+
+		mensaje +=
+			"Estamos dando seguimiento a su solicitud.\n" +
+			"Saludos.";
+
+		// Codificar mensaje para URL
+		let url = "https://wa.me/" + telefono + "?text=" + encodeURIComponent(mensaje);
+
+		if (ventanaWhatsApp && !ventanaWhatsApp.closed) {
+
+			ventanaWhatsApp.location.href = url;
+			ventanaWhatsApp.focus();
+
+		} else {
+
+			ventanaWhatsApp = window.open(url, 'whatsapp_ticket');
+		}
+
+		// // Abrir WhatsApp
+		// window.open(url, '_blank');
+	}
 
 
 

@@ -2,6 +2,7 @@
 
 // require 'core/auth.php';
 require './config/database.php';
+require './core/Auth.php';
 
 if ($_SESSION["rol"] == 'admin') {
     $sql = "SELECT count(*) total 

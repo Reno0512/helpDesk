@@ -146,7 +146,8 @@
                         <input
                             name="reportante"
                             class="form-control primera-mayuscula"
-                            placeholder="Nombre de quien reporta">
+                            placeholder="Nombre de quien reporta"
+                            required>
                     </div>
 
                     <div class="mb-3">
@@ -154,7 +155,8 @@
                         <input
                             name="titulo"
                             class="form-control primera-mayuscula"
-                            placeholder="Titulo o asunto principal del problema">
+                            placeholder="Titulo o asunto principal del problema"
+                            required>
                     </div>
 
                     <div class="mb-3">

@@ -107,9 +107,9 @@
     <div class="contenido">
         <div class="encabezado">
             Área: Dirección de Informática <br>
-            Taxco de Alarcón, Guerrero a <span><?php date_default_timezone_set('America/Mexico_City');
-                                                $meses = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-                                                echo date('j') . " de " . $meses[date('n')] . " de " . date('Y'); ?></span> <br>
+            Taxco de Alarcón, Guerrero a <span><?php $meses = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                                                $timestamp = strtotime($ticket["fecha_cierre"]);
+                                                echo date('j', $timestamp) . " de " . $meses[date('n', $timestamp)] . " de " . date('Y', $timestamp); ?></span> <br>
             “2026, Año de Margarita Maza Parada” <br>
         </div>
 
@@ -133,14 +133,17 @@
 
         <h4>Evidencia:</h4>
 
-        <div style="width: 50%; float:left;">
-            <img src="<?php echo 'uploads/tickets/' . $ticket["evidencia"]; ?>" style="height:180px;border:1px solid #ccc;">
-        </div>
+        <?php if (!empty($ticket["evidencia"])) : ?>
+            <div style="width: 50%; float:left;">
+                <img src="<?php echo 'uploads/tickets/' . $ticket["evidencia"]; ?>" style="height:180px;border:1px solid #ccc;">
+            </div>
+        <?php endif; ?>
 
-        <div style="width: 50%; float:left;">
-            <img src="<?php echo $ultimoSeguimiento["imagen"]; ?>" style="height:180px;border:1px solid #ccc;">
-        </div>
-
+        <?php if (!empty($ultimoSeguimiento["imagen"])) : ?>
+            <div style="width: 50%; float:left;">
+                <img src="<?php echo $ultimoSeguimiento["imagen"]; ?>" style="height:180px;border:1px solid #ccc;">
+            </div>
+        <?php endif; ?>
 
         <table class="tabla-firmas">
             <tr>

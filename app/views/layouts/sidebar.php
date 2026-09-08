@@ -31,7 +31,7 @@
                 </li>
             <?php endif; ?>
 
-            <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico"): ?>
+            <?php if ($_SESSION["rol"] === "admin" || $_SESSION["rol"] === "tecnico" || $_SESSION["rol"] === "asistente") : ?>
                 <li class="nav-item mb-2">
                     <a href="/tickets" class="text-white text-decoration-none">Tickets</a>
                 </li>
